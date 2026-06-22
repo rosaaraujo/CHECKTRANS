@@ -94,6 +94,10 @@
                         <h5><i class="fas fa-cog me-2"></i>Acciones</h5>
                     </div>
                     <div class="card-body">
+                        <a th:href="@{/templates/{id}/versions/{vId}/phases(id=${version.templateId}, vId=${version.id})}"
+                           class="btn btn-primary w-100 mb-2">
+                            <i class="fas fa-layer-group me-1"></i>Gestionar Fases
+                        </a>
                         <a th:href="@{/templates/{id}/versions(id=${version.templateId})}"
                            class="btn btn-outline-secondary w-100 mb-2">
                             <i class="fas fa-history me-1"></i>Historial Completo

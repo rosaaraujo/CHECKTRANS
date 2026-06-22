@@ -9,16 +9,22 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "checklist_phases")
+@Table(name = "checklist_phases", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"version_id", "code"})
+})
 public class ChecklistPhase extends AuditableEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "version_id", nullable = false)
     private ChecklistTemplateVersion version;
+
+    @Column(nullable = false, length = 20)
+    private String code;
 
     @Column(name = "phase_order", nullable = false)
     private Integer phaseOrder;
@@ -51,6 +57,14 @@ public class ChecklistPhase extends AuditableEntity {
 
     public void setVersion(ChecklistTemplateVersion version) {
         this.version = version;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public Integer getPhaseOrder() {

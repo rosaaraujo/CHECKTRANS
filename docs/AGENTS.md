@@ -33,6 +33,7 @@ checktrans/
 │   │   │   │   ├── HomeController.java
 │   │   │   │   ├── ChecklistController.java
 │   │   │   │   ├── ChecklistTemplateController.java
+│   │   │   │   ├── ChecklistPhaseController.java
 │   │   │   │   └── DemoController.java
 │   │   │   ├── domain/
 │   │   │   │   ├── AuditableEntity.java
@@ -52,6 +53,8 @@ checktrans/
 │   │   │   │   ├── ChecklistDTO.java
 │   │   │   │   ├── ChecklistCreateDTO.java
 │   │   │   │   ├── ChecklistItemDTO.java
+│   │   │   │   ├── ChecklistPhaseDTO.java
+│   │   │   │   ├── ChecklistPhaseCreateDTO.java
 │   │   │   │   ├── ChecklistTemplateDTO.java
 │   │   │   │   ├── ChecklistTemplateCreateDTO.java
 │   │   │   │   └── ChecklistTemplateVersionDTO.java
@@ -68,6 +71,7 @@ checktrans/
 │   │   │   │       ├── ChecklistPhaseRepository.java
 │   │   │   │       └── ChecklistTemplateItemRepository.java
 │   │   │   ├── service/
+│   │   │   │   ├── ChecklistPhaseService.java
 │   │   │   │   ├── ChecklistService.java
 │   │   │   │   └── ChecklistTemplateService.java
 │   │   │   ├── mapper/
@@ -205,7 +209,7 @@ docker compose up --build
 | 4    | Completada  | Modelo JPA de plantillas (templates)            |
 | 5    | Completada  | Gestión de plantillas (CRUD servicios/vistas)   |
 | 6    | Completada  | Versionado de plantillas                        |
-| 7    | Pendiente   | Ejecución de listas de chequeo                  |
+| 7    | Completada  | Gestión de fases                                |
 | 8    | Pendiente   | Dashboard y reportes                            |
 | 9    | Pendiente   | API REST                                        |
 | 10   | Pendiente   | Notificaciones y alertas                        |
@@ -213,8 +217,8 @@ docker compose up --build
 
 ## Fase Actual
 
-**Fase 6**: Versionado de plantillas (completada)
-**Siguiente**: Fase 7 — Autenticación y autorización (Spring Security)
+**Fase 7**: Gestión de fases (completada)
+**Siguiente**: Fase 8 — Ejecución de listas de chequeo
 
 ## Archivos Creados en Fase 4
 
@@ -232,6 +236,19 @@ docker compose up --build
 | `src/main/java/.../repository/template/ChecklistPhaseRepository.java` | Repositorio con findByVersionIdOrderByPhaseOrderAsc |
 | `src/main/java/.../repository/template/ChecklistTemplateItemRepository.java` | Repositorio con findByPhaseIdOrderByItemOrderAsc |
 | `src/test/java/.../repository/template/ChecklistTemplateRepositoryTest.java` | 14 tests de integración JPA: CRUD, relaciones, cascada, tipos de ítem, transición de estados |
+
+## Archivos Creados en Fase 7
+
+| Archivo | Propósito |
+|---------|-----------|
+| `src/main/java/.../dto/ChecklistPhaseDTO.java` | DTO de fase con id, versionId, code, phaseOrder, name, description, createdAt, updatedAt |
+| `src/main/java/.../dto/ChecklistPhaseCreateDTO.java` | DTO de creación/edición con Bean Validation (@NotBlank, @NotNull, @Size) |
+| `src/main/java/.../service/ChecklistPhaseService.java` | Servicio CRUD + reorder: create vía cascada desde versión, update directo, delete vía orphanRemoval, moveUp/moveDown intercambiando phaseOrder |
+| `src/main/java/.../controller/ChecklistPhaseController.java` | MVC controller anidado bajo /templates/{templateId}/versions/{versionId}/phases con endpoints list, create, edit, update, delete, moveUp, moveDown |
+| `src/main/resources/templates/phase/list.html` | Vista de listado con tabla responsive, botones de reordenación (up/down), editar y eliminar por fase |
+| `src/main/resources/templates/phase/form.html` | Vista de formulario con campos orden, código, nombre, descripción y validación |
+| `src/test/java/.../service/ChecklistPhaseServiceTest.java` | 14 tests unitarios: CRUD, duplicado, reordenación (moveUp, moveDown, límites) |
+| `src/test/java/.../controller/ChecklistPhaseControllerTest.java` | 10 tests MVC: list, create form, create validation errors, create success, edit form, update, update validation errors, delete, moveUp, moveDown |
 
 ## Archivos Creados en Fase 6
 
@@ -255,6 +272,16 @@ docker compose up --build
 | `src/main/resources/templates/template/detail.html` | Vista de detalle con info general, fechas de creación/actualización, acciones de editar/desactivar |
 | `src/test/java/.../controller/ChecklistTemplateControllerTest.java` | 9 tests MVC con MockMvc: list, create form, create success, validation errors, detail, edit form, update, update validation errors, deactivate |
 | `src/test/java/.../service/ChecklistTemplateServiceTest.java` | 11 tests unitarios con Mockito: create, duplicate code on create, findById, not found, update, duplicate code on update, update same code, deactivate, deactivate not found, pagination, searchByName |
+
+## Modificaciones en Fase 7
+
+| Archivo | Cambio |
+|---------|--------|
+| `src/main/java/.../domain/template/ChecklistPhase.java` | Añadido campo `code` (String, length=20) y `@UniqueConstraint(columnNames = {"version_id", "code"})` a nivel de tabla |
+| `src/main/java/.../repository/template/ChecklistPhaseRepository.java` | Añadidos findByVersionIdAndId, existsByVersionIdAndCode, findTopByVersionIdOrderByPhaseOrderDesc |
+| `src/main/resources/templates/template/version-detail.html` | Añadido botón "Gestionar Fases" en la tarjeta de acciones |
+| `src/main/resources/ValidationMessages.properties` | Añadidas 6 claves de mensaje para validación de fase (code, order, name, description) |
+| `src/test/java/.../repository/template/ChecklistTemplateRepositoryTest.java` | Actualizados tests de fase para incluir campo `code` |
 
 ## Modificaciones en Fase 6
 
@@ -284,10 +311,20 @@ ChecklistTemplate (1) ─── * ChecklistTemplateVersion (1) ─── * Check
 ```
 
 ### Tests
-- **Totales**: 85 (78 anteriores + 5 service + 2 controller), BUILD SUCCESS.
+- **Totales**: 109 (85 anteriores + 14 service + 10 controller), BUILD SUCCESS.
 - Fase 4: 14 tests de integración cubren CRUD por código, activos, versiones, fases, ítems, cascade delete, variantes de ItemType, transición de ChecklistExecutionStatus.
 - Fase 5: 11 tests unitarios de servicio (Mockito) + 9 tests MVC (MockMvc) cubren CRUD completo, validación, búsqueda, soft delete.
 - Fase 6: 5 nuevos tests unitarios de servicio (findVersionsByTemplateId, findVersionById, version mismatch, error cases) + 2 nuevos tests MVC (version history, version detail). 16 tests de servicio total + 11 tests MVC total.
+- Fase 7: 14 tests unitarios de servicio (CRUD, duplicado, reordenación, límites) + 10 tests MVC (list, create/edit/delete, validación, moveUp/moveDown).
+
+### Gestión de Fases (Fase 7)
+- `ChecklistPhaseService` gestiona fases dentro de una versión de plantilla.
+- Alta: se crea la fase, se añade a la versión via `version.addPhase()`, y se persiste la versión (cascada JPA).
+- Edición: se actualiza la fase directamente via `phaseRepository.save()`.
+- Eliminación: se usa `version.removePhase()` + `versionRepository.save()` para activar orphanRemoval JPA, manteniendo integridad referencial (cascade delete de items hijos).
+- Reordenación: `moveUp()` y `moveDown()` intercambian `phaseOrder` entre la fase actual y su adyacente.
+- `@UniqueConstraint(columnNames = {"version_id", "code"})` garantiza códigos únicos dentro de cada versión a nivel BD.
+- Las fases se gestionan bajo la URL `/templates/{templateId}/versions/{versionId}/phases`.
 
 ### Versionado de Plantillas (Fase 6)
 - `ChecklistTemplate.create()` crea automáticamente la versión inicial (v1) con `activeVersion=true` y `publicationDate=LocalDate.now()`.

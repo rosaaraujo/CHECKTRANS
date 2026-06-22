@@ -54,6 +54,7 @@ class ChecklistTemplateRepositoryTest {
     private ChecklistPhase createSamplePhase(ChecklistTemplateVersion version) {
         ChecklistPhase phase = new ChecklistPhase();
         phase.setVersion(version);
+        phase.setCode("FASE-DOC");
         phase.setPhaseOrder(1);
         phase.setName("Documentación");
         phase.setDescription("Verificación de documentos");
@@ -170,6 +171,7 @@ class ChecklistTemplateRepositoryTest {
         ChecklistPhase phase = createSamplePhase(version);
 
         assertNotNull(phase.getId());
+        assertEquals("FASE-DOC", phase.getCode());
         assertEquals(1, phase.getPhaseOrder());
         assertEquals("Documentación", phase.getName());
     }
@@ -182,6 +184,7 @@ class ChecklistTemplateRepositoryTest {
 
         ChecklistPhase phase2 = new ChecklistPhase();
         phase2.setVersion(version);
+        phase2.setCode("FASE-EST");
         phase2.setPhaseOrder(2);
         phase2.setName("Estado del vehículo");
         phaseRepository.save(phase2);
@@ -242,6 +245,7 @@ class ChecklistTemplateRepositoryTest {
         version.setStatus(ChecklistExecutionStatus.CREADA);
 
         ChecklistPhase phase = new ChecklistPhase();
+        phase.setCode("FASE-01");
         phase.setPhaseOrder(1);
         phase.setName("Phase 1");
 
