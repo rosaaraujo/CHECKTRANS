@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}"
+      lang="es">
+<head>
+    <title>CHECKTRANS - Detalle Lista de Chequeo</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/}">Inicio</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/checklists}">Listas</a></li>
+                        <li class="breadcrumb-item active" aria-current="page" th:text="${checklist.code}">CT-001</li>
+                    </ol>
+                </nav>
+                <h1>
+                    Lista <span th:text="${checklist.code}">CT-001</span>
+                </h1>
+            </div>
+            <div class="page-actions">
+                <a th:href="@{/checklists}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Volver
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card card-checktrans mb-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-info-circle me-2"></i>Informaci&oacute;n General</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small">C&oacute;digo</label>
+                                <p class="fw-bold mb-0" th:text="${checklist.code}">CT-001</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small">Estado</label>
+                                <p class="mb-0">
+                                    <th:block th:switch="${checklist.status.name()}">
+                                        <span th:case="'DRAFT'" class="badge badge-status badge-draft">DRAFT</span>
+                                        <span th:case="'COMPLETED'" class="badge badge-status badge-completed">COMPLETED</span>
+                                        <span th:case="'APPROVED'" class="badge badge-status badge-approved">APPROVED</span>
+                                        <span th:case="'REJECTED'" class="badge badge-status badge-rejected">REJECTED</span>
+                                    </th:block>
+                                </p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small">Matr&iacute;cula</label>
+                                <p class="fw-bold mb-0" th:text="${checklist.transportPlate}">1234ABC</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small">Tipo de Transporte</label>
+                                <p class="fw-bold mb-0" th:text="${checklist.transportType}">TRUCK</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small">Inspector</label>
+                                <p class="fw-bold mb-0" th:text="${checklist.inspectorName}">Inspector</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small">Fecha de Revisi&oacute;n</label>
+                                <p class="fw-bold mb-0"
+                                   th:text="${#temporals.format(checklist.checkDate, 'dd/MM/yyyy HH:mm')}">01/01/2026</p>
+                            </div>
+                        </div>
+
+                        <div th:if="${checklist.observations}" class="mt-2">
+                            <label class="text-muted small">Observaciones</label>
+                            <p class="mb-0" th:text="${checklist.observations}">Observaciones</p>
+                        </div>
+
+                        <hr>
+                        <div class="row text-muted small">
+                            <div class="col">
+                                <span>Creado: <span th:text="${#temporals.format(checklist.createdAt, 'dd/MM/yyyy HH:mm')}"></span></span>
+                            </div>
+                            <div class="col text-end">
+                                <span>Actualizado: <span th:text="${#temporals.format(checklist.updatedAt, 'dd/MM/yyyy HH:mm')}"></span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-checktrans">
+                    <div class="card-header">
+                        <h5><i class="fas fa-tasks me-2"></i>Elementos de la Lista</h5>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-checktrans">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Descripci&oacute;n</th>
+                                    <th>Resultado</th>
+                                    <th>Observaciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="item : ${checklist.items}"
+                                    th:unless="${#lists.isEmpty(checklist.items)}">
+                                    <td data-label="#" th:text="${item.itemOrder}">1</td>
+                                    <td data-label="Descripci&oacute;n" th:text="${item.description}">Descripci&oacute;n</td>
+                                    <td data-label="Resultado">
+                                        <span th:if="${item.isPass != null}">
+                                            <span th:if="${item.isPass}" class="result-si">
+                                                <i class="fas fa-check-circle"></i> Correcto
+                                            </span>
+                                            <span th:unless="${item.isPass}" class="result-no">
+                                                <i class="fas fa-times-circle"></i> Incorrecto
+                                            </span>
+                                        </span>
+                                        <span th:if="${item.isPass == null}" class="result-na">
+                                            <i class="fas fa-minus-circle"></i> Pendiente
+                                        </span>
+                                    </td>
+                                    <td data-label="Observaciones" th:text="${item.observations}">-</td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(checklist.items)}">
+                                    <td colspan="4" class="text-center py-4 text-muted">
+                                        <i class="fas fa-inbox me-2"></i>Sin elementos registrados
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card card-checktrans mb-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-cog me-2"></i>Acciones</h5>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/checklists/{id}/status(id=${checklist.id})}" method="post" class="mb-3">
+                            <label class="form-label">Cambiar Estado</label>
+                            <div class="input-group">
+                                <select name="status" class="form-select">
+                                    <option value="DRAFT" th:selected="${checklist.status.name() == 'DRAFT'}">Borrador</option>
+                                    <option value="COMPLETED" th:selected="${checklist.status.name() == 'COMPLETED'}">Completado</option>
+                                    <option value="APPROVED" th:selected="${checklist.status.name() == 'APPROVED'}">Aprobado</option>
+                                    <option value="REJECTED" th:selected="${checklist.status.name() == 'REJECTED'}">Rechazado</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </form>
+
+                        <form th:action="@{/checklists/{id}/delete(id=${checklist.id})}" method="post"
+                              onsubmit="return confirm('¿Está seguro de eliminar esta lista de chequeo?')">
+                            <button type="submit" class="btn btn-danger w-100">
+                                <i class="fas fa-trash me-1"></i>Eliminar Lista
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

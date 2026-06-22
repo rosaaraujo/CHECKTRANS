@@ -1,0 +1,34 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: checktrans-db
+    environment:
+      POSTGRES_DB: checktrans
+      POSTGRES_USER: checktrans
+      POSTGRES_PASSWORD: checktrans
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U checktrans"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: checktrans-app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/checktrans
+      SPRING_DATASOURCE_USERNAME: checktrans
+      SPRING_DATASOURCE_PASSWORD: checktrans
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

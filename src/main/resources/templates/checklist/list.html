@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}"
+      lang="es">
+<head>
+    <title>CHECKTRANS - Listas de Chequeo</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/}">Inicio</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Listas de Chequeo</li>
+                    </ol>
+                </nav>
+                <h1>Listas de Chequeo</h1>
+            </div>
+            <div class="page-actions">
+                <a th:href="@{/checklists/new}" class="btn btn-accent">
+                    <i class="fas fa-plus me-1"></i>Nueva Lista
+                </a>
+            </div>
+        </div>
+
+        <div class="card card-checktrans mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-search me-2"></i>Buscar</h5>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/checklists}" method="get" class="row g-3">
+                    <div class="col-md-6">
+                        <label for="search" class="form-label">Buscar por inspector</label>
+                        <div class="input-group">
+                            <input type="text" id="search" name="search"
+                                   class="form-control" placeholder="Nombre del inspector..."
+                                   th:value="${search}">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(checklists.content)}">
+            <div class="card card-checktrans">
+                <div class="card-body">
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h5>No hay listas de chequeo</h5>
+                        <p>Cree una nueva lista de chequeo para comenzar</p>
+                        <a th:href="@{/checklists/new}" class="btn btn-accent mt-2">
+                            <i class="fas fa-plus me-1"></i>Crear Primera Lista
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${not #lists.isEmpty(checklists.content)}">
+            <div class="card card-checktrans">
+                <div class="table-responsive">
+                    <table class="table table-checktrans">
+                        <thead>
+                            <tr>
+                                <th>C&oacute;digo</th>
+                                <th>Matr&iacute;cula</th>
+                                <th class="d-none d-md-table-cell">Tipo</th>
+                                <th>Inspector</th>
+                                <th class="d-none d-md-table-cell">Fecha</th>
+                                <th>Estado</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="checklist : ${checklists.content}">
+                                <td data-label="C&oacute;digo">
+                                    <strong th:text="${checklist.code}">CT-001</strong>
+                                </td>
+                                <td data-label="Matr&iacute;cula" th:text="${checklist.transportPlate}">1234ABC</td>
+                                <td data-label="Tipo" class="d-none d-md-table-cell" th:text="${checklist.transportType}">TRUCK</td>
+                                <td data-label="Inspector" th:text="${checklist.inspectorName}">Inspector</td>
+                                <td data-label="Fecha" class="d-none d-md-table-cell"
+                                    th:text="${#temporals.format(checklist.checkDate, 'dd/MM/yyyy HH:mm')}">01/01/2026</td>
+                                <td data-label="Estado">
+                                    <th:block th:switch="${checklist.status.name()}">
+                                        <span th:case="'DRAFT'" class="badge badge-status badge-draft">DRAFT</span>
+                                        <span th:case="'COMPLETED'" class="badge badge-status badge-completed">COMPLETED</span>
+                                        <span th:case="'APPROVED'" class="badge badge-status badge-approved">APPROVED</span>
+                                        <span th:case="'REJECTED'" class="badge badge-status badge-rejected">REJECTED</span>
+                                    </th:block>
+                                </td>
+                                <td data-label="Acciones" class="text-end">
+                                    <a th:href="@{/checklists/{id}(id=${checklist.id})}"
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div th:if="${checklists.totalPages > 1}" class="d-flex justify-content-center mt-4">
+                <nav>
+                    <ul class="pagination">
+                        <li class="page-item" th:classappend="${checklists.number == 0} ? 'disabled'">
+                            <a class="page-link" th:href="@{/checklists(page=0, search=${search})}">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item" th:classappend="${checklists.number == 0} ? 'disabled'">
+                            <a class="page-link" th:href="@{/checklists(page=${checklists.number - 1}, search=${search})}">
+                                <i class="fas fa-angle-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, checklists.totalPages - 1)}"
+                            th:classappend="${i == checklists.number} ? 'active'">
+                            <a class="page-link" th:href="@{/checklists(page=${i}, search=${search})}"
+                               th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${checklists.number == checklists.totalPages - 1} ? 'disabled'">
+                            <a class="page-link" th:href="@{/checklists(page=${checklists.number + 1}, search=${search})}">
+                                <i class="fas fa-angle-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item" th:classappend="${checklists.number == checklists.totalPages - 1} ? 'disabled'">
+                            <a class="page-link" th:href="@{/checklists(page=${checklists.totalPages - 1}, search=${search})}">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

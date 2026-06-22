@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}"
+      lang="es">
+<head>
+    <title>CHECKTRANS - Conflicto</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="empty-state py-5">
+            <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: var(--color-accent); opacity: 0.6;"></i>
+            <h1 class="display-4 fw-bold mt-3" style="color: var(--color-primary-dark);">409</h1>
+            <h5>Conflicto</h5>
+            <p th:if="${error}" th:text="${error}"></p>
+            <a th:href="@{/checklists}" class="btn btn-primary mt-3">
+                <i class="fas fa-arrow-left me-1"></i>Volver a Listas
+            </a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,19 @@
+checktrans:
+  app:
+    name: CHECKTRANS
+    version: 1.0.0
+    description: Sistema de Gesti&oacute;n de Listas de Chequeo de Transportes
+    locale: es_ES
+    timezone: Europe/Madrid
+  pagination:
+    default-page-size: 10
+    max-page-size: 100
+  audit:
+    enabled: true
+    include-created-at: true
+    include-updated-at: true
+  checklist:
+    code-prefix: CT-
+    max-items: 50
+    max-observations-length: 2000
+    allowed-status: DRAFT, COMPLETED, APPROVED, REJECTED

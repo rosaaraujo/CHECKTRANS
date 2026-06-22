@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}"
+      lang="es">
+<head>
+    <title>CHECKTRANS - Nueva Lista de Chequeo</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/}">Inicio</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/checklists}">Listas</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Nueva Lista</li>
+                    </ol>
+                </nav>
+                <h1>Nueva Lista de Chequeo</h1>
+            </div>
+            <div class="page-actions">
+                <a th:href="@{/checklists}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Volver
+                </a>
+            </div>
+        </div>
+
+        <div class="card card-checktrans">
+            <div class="card-header">
+                <h5><i class="fas fa-clipboard-list me-2"></i>Datos de la Lista</h5>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/checklists}" th:object="${checklist}" method="post"
+                      class="form-checktrans needs-validation" novalidate>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="code" class="form-label required">C&oacute;digo</label>
+                            <input type="text" id="code" th:field="*{code}"
+                                   class="form-control" th:classappend="${#fields.hasErrors('code')} ? 'is-invalid'"
+                                   maxlength="20" required>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('code')}"
+                                 th:errors="*{code}">Error</div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="transportPlate" class="form-label required">Matr&iacute;cula</label>
+                            <input type="text" id="transportPlate" th:field="*{transportPlate}"
+                                   class="form-control" th:classappend="${#fields.hasErrors('transportPlate')} ? 'is-invalid'"
+                                   maxlength="15" required>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('transportPlate')}"
+                                 th:errors="*{transportPlate}">Error</div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="transportType" class="form-label required">Tipo de Transporte</label>
+                            <select id="transportType" th:field="*{transportType}"
+                                    class="form-select" th:classappend="${#fields.hasErrors('transportType')} ? 'is-invalid'" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="TRUCK">Cami&oacute;n</option>
+                                <option value="VAN">Furgoneta</option>
+                                <option value="TRAILER">Remolque</option>
+                                <option value="CONTAINER">Contenedor</option>
+                                <option value="OTHER">Otro</option>
+                            </select>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('transportType')}"
+                                 th:errors="*{transportType}">Error</div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="inspectorName" class="form-label required">Inspector</label>
+                            <input type="text" id="inspectorName" th:field="*{inspectorName}"
+                                   class="form-control" th:classappend="${#fields.hasErrors('inspectorName')} ? 'is-invalid'"
+                                   maxlength="100" required>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('inspectorName')}"
+                                 th:errors="*{inspectorName}">Error</div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="checkDate" class="form-label required">Fecha de Revisi&oacute;n</label>
+                            <input type="datetime-local" id="checkDate" th:field="*{checkDate}"
+                                   class="form-control" th:classappend="${#fields.hasErrors('checkDate')} ? 'is-invalid'" required>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('checkDate')}"
+                                 th:errors="*{checkDate}">Error</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <label for="observations" class="form-label">Observaciones</label>
+                        <textarea id="observations" th:field="*{observations}"
+                                  class="form-control" th:classappend="${#fields.hasErrors('observations')} ? 'is-invalid'"
+                                  rows="3" maxlength="2000"></textarea>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('observations')}"
+                             th:errors="*{observations}">Error</div>
+                    </div>
+
+                    <hr class="my-4">
+                    <h5 class="mb-3"><i class="fas fa-tasks me-2"></i>Elementos de la Lista</h5>
+
+                    <div id="items-container">
+                        <div class="row g-2 mb-2 item-row" th:each="item, iterStat : *{items}">
+                            <div class="col-md-6">
+                                <input type="text" th:field="*{items[__${iterStat.index}__].description}"
+                                       class="form-control form-control-sm" placeholder="Descripci&oacute;n del elemento">
+                            </div>
+                            <div class="col-md-2">
+                                <select th:field="*{items[__${iterStat.index}__].isPass}"
+                                        class="form-select form-select-sm">
+                                    <option value="">Seleccionar</option>
+                                    <option th:value="true">Correcto</option>
+                                    <option th:value="false">Incorrecto</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" th:field="*{items[__${iterStat.index}__].observations}"
+                                       class="form-control form-control-sm" placeholder="Observaciones">
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" class="btn btn-outline-danger btn-sm remove-item"
+                                        th:if="${iterStat.index > 0}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <input type="hidden" th:field="*{items[__${iterStat.index}__].itemOrder}"
+                                   th:value="${iterStat.index}">
+                        </div>
+                    </div>
+
+                    <button type="button" id="add-item" class="btn btn-outline-primary btn-sm mt-2">
+                        <i class="fas fa-plus me-1"></i>A&ntilde;adir Elemento
+                    </button>
+
+                    <hr class="my-4">
+                    <div class="d-flex justify-content-end gap-2">
+                        <a th:href="@{/checklists}" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Guardar Lista
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/checklist-form.js}"></script>
+</body>
+</html>

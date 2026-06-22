@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}"
+      lang="es">
+<head>
+    <title>CHECKTRANS - Detalle Plantilla</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/}">Inicio</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/templates}">Plantillas</a></li>
+                        <li class="breadcrumb-item active" aria-current="page" th:text="${template.code}">TMP-001</li>
+                    </ol>
+                </nav>
+                <h1>
+                    Plantilla <span th:text="${template.code}">TMP-001</span>
+                </h1>
+            </div>
+            <div class="page-actions">
+                <a th:href="@{/templates}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Volver
+                </a>
+                <a th:href="@{/templates/{id}/edit(id=${template.id})}" class="btn btn-primary">
+                    <i class="fas fa-edit me-1"></i>Editar
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card card-checktrans mb-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-info-circle me-2"></i>Informaci&oacute;n General</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small">C&oacute;digo</label>
+                                <p class="fw-bold mb-0" th:text="${template.code}">TMP-001</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small">Activa</label>
+                                <p class="mb-0">
+                                    <span th:if="${template.active}" class="badge badge-status badge-completed">
+                                        <i class="fas fa-check me-1"></i>SI
+                                    </span>
+                                    <span th:unless="${template.active}" class="badge badge-status badge-rejected">
+                                        <i class="fas fa-times me-1"></i>NO
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="text-muted small">Nombre</label>
+                                <p class="fw-bold mb-0" th:text="${template.name}">Nombre</p>
+                            </div>
+                        </div>
+
+                        <div th:if="${template.description}" class="mt-2">
+                            <label class="text-muted small">Descripci&oacute;n</label>
+                            <p class="mb-0" th:text="${template.description}">Descripci&oacute;n</p>
+                        </div>
+
+                        <hr>
+                        <div class="row text-muted small">
+                            <div class="col">
+                                <span>Creado: <span th:text="${#temporals.format(template.createdAt, 'dd/MM/yyyy HH:mm')}"></span></span>
+                            </div>
+                            <div class="col text-end">
+                                <span>Actualizado: <span th:text="${#temporals.format(template.updatedAt, 'dd/MM/yyyy HH:mm')}"></span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card card-checktrans mb-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-cog me-2"></i>Acciones</h5>
+                    </div>
+                    <div class="card-body">
+                        <a th:href="@{/templates/{id}/edit(id=${template.id})}"
+                           class="btn btn-primary w-100 mb-2">
+                            <i class="fas fa-edit me-1"></i>Editar Plantilla
+                        </a>
+
+                        <form th:action="@{/templates/{id}/deactivate(id=${template.id})}" method="post"
+                              th:if="${template.active}"
+                              onsubmit="return confirm('&iquest;Est&aacute; seguro de desactivar esta plantilla?')">
+                            <button type="submit" class="btn btn-danger w-100">
+                                <i class="fas fa-ban me-1"></i>Desactivar Plantilla
+                            </button>
+                        </form>
+
+                        <div th:unless="${template.active}" class="alert alert-info mb-0 mt-2">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Esta plantilla est&aacute; desactivada
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

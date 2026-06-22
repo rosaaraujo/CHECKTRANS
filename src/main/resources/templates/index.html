@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}"
+      lang="es">
+<head>
+    <title>CHECKTRANS - Inicio</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item active" aria-current="page">Inicio</li>
+                    </ol>
+                </nav>
+                <h1>CHECKTRANS</h1>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <div class="py-5">
+                    <div class="stat-card mb-4 d-inline-block" style="width: auto; padding: 2rem 3rem;">
+                        <i class="fas fa-clipboard-check" style="font-size: 3.5rem; color: var(--color-primary);"></i>
+                        <div class="stat-number mt-2" th:text="${appVersion}">1.0.0</div>
+                        <div class="stat-label">Versi&oacute;n</div>
+                    </div>
+                    <p class="lead text-muted mt-3">
+                        Sistema de Gesti&oacute;n de Listas de Chequeo de Transportes
+                    </p>
+                    <hr class="my-4 w-50 mx-auto">
+                    <div class="d-flex justify-content-center gap-3 mt-4 mobile-stack">
+                        <a th:href="@{/checklists}" class="btn btn-primary btn-lg px-4">
+                            <i class="fas fa-list me-2"></i>Ver Listas
+                        </a>
+                        <a th:href="@{/checklists/new}" class="btn btn-accent btn-lg px-4">
+                            <i class="fas fa-plus me-2"></i>Nueva Lista
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,36 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: checktrans
+
+  config:
+    import: classpath:checktrans.yml
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/checktrans
+    username: checktrans
+    password: checktrans
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  thymeleaf:
+    cache: true
+    mode: HTML
+    encoding: UTF-8
+
+  web:
+    locale: es_ES
+    locale-resolver: fixed
+
+  jackson:
+    locale: es_ES
