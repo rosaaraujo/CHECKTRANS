@@ -13,6 +13,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,9 +28,15 @@ public class ChecklistTemplateVersion extends AuditableEntity {
     @Column(name = "version_number", nullable = false)
     private Integer versionNumber;
 
+    @Column(name = "active_version", nullable = false)
+    private Boolean activeVersion = false;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private ChecklistExecutionStatus status = ChecklistExecutionStatus.CREADA;
+
+    @Column(name = "publication_date")
+    private LocalDate publicationDate;
 
     @Column(name = "effective_date")
     private LocalDate effectiveDate;
@@ -66,12 +73,28 @@ public class ChecklistTemplateVersion extends AuditableEntity {
         this.versionNumber = versionNumber;
     }
 
+    public Boolean getActiveVersion() {
+        return activeVersion;
+    }
+
+    public void setActiveVersion(Boolean activeVersion) {
+        this.activeVersion = activeVersion;
+    }
+
     public ChecklistExecutionStatus getStatus() {
         return status;
     }
 
     public void setStatus(ChecklistExecutionStatus status) {
         this.status = status;
+    }
+
+    public LocalDate getPublicationDate() {
+        return publicationDate;
+    }
+
+    public void setPublicationDate(LocalDate publicationDate) {
+        this.publicationDate = publicationDate;
     }
 
     public LocalDate getEffectiveDate() {

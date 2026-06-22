@@ -5,11 +5,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import es.araujo.checktrans.domain.template.ChecklistTemplate;
+import es.araujo.checktrans.domain.template.ChecklistTemplateVersion;
 import es.araujo.checktrans.dto.ChecklistTemplateCreateDTO;
 import es.araujo.checktrans.dto.ChecklistTemplateDTO;
+import es.araujo.checktrans.dto.ChecklistTemplateVersionDTO;
 import es.araujo.checktrans.exception.DuplicateCodeException;
 import es.araujo.checktrans.exception.ResourceNotFoundException;
 import es.araujo.checktrans.repository.template.ChecklistTemplateRepository;
+import es.araujo.checktrans.repository.template.ChecklistTemplateVersionRepository;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,15 +31,18 @@ class ChecklistTemplateServiceTest {
     @Mock
     private ChecklistTemplateRepository templateRepository;
 
+    @Mock
+    private ChecklistTemplateVersionRepository versionRepository;
+
     private ChecklistTemplateService templateService;
 
     @BeforeEach
     void setUp() {
-        templateService = new ChecklistTemplateService(templateRepository);
+        templateService = new ChecklistTemplateService(templateRepository, versionRepository);
     }
 
     @Test
-    void shouldCreateTemplate() {
+    void shouldCreateTemplateWithInitialVersion() {
         ChecklistTemplateCreateDTO createDTO = new ChecklistTemplateCreateDTO();
         createDTO.setCode("TMP-001");
         createDTO.setName("Inspeccion General");
@@ -55,6 +61,8 @@ class ChecklistTemplateServiceTest {
         assertEquals("TMP-001", result.getCode());
         assertEquals("Inspeccion General", result.getName());
         assertTrue(result.getActive());
+        assertEquals(1, result.getCurrentVersionNumber());
+        assertNotNull(result.getCurrentVersionDate());
         verify(templateRepository).save(any(ChecklistTemplate.class));
     }
 
@@ -95,12 +103,17 @@ class ChecklistTemplateServiceTest {
     }
 
     @Test
-    void shouldUpdateTemplate() {
+    void shouldUpdateTemplateAndCreateNewVersion() {
         ChecklistTemplate template = new ChecklistTemplate();
         template.setId(1L);
         template.setCode("TMP-001");
         template.setName("Inspeccion General");
         template.setActive(true);
+
+        ChecklistTemplateVersion existingVersion = new ChecklistTemplateVersion();
+        existingVersion.setVersionNumber(1);
+        existingVersion.setActiveVersion(true);
+        template.addVersion(existingVersion);
 
         ChecklistTemplateCreateDTO updateDTO = new ChecklistTemplateCreateDTO();
         updateDTO.setCode("TMP-002");
@@ -109,6 +122,8 @@ class ChecklistTemplateServiceTest {
 
         when(templateRepository.findById(1L)).thenReturn(Optional.of(template));
         when(templateRepository.existsByCode("TMP-002")).thenReturn(false);
+        when(versionRepository.findTopByTemplateIdOrderByVersionNumberDesc(1L))
+                .thenReturn(Optional.of(existingVersion));
         when(templateRepository.save(any(ChecklistTemplate.class))).thenReturn(template);
 
         ChecklistTemplateDTO result = templateService.update(1L, updateDTO);
@@ -116,6 +131,8 @@ class ChecklistTemplateServiceTest {
         assertNotNull(result);
         assertEquals("TMP-002", result.getCode());
         assertEquals("Inspeccion Detallada", result.getName());
+        assertEquals(2, result.getCurrentVersionNumber());
+        verify(templateRepository).save(any(ChecklistTemplate.class));
     }
 
     @Test
@@ -142,18 +159,26 @@ class ChecklistTemplateServiceTest {
         template.setCode("TMP-001");
         template.setName("Original");
 
+        ChecklistTemplateVersion existingVersion = new ChecklistTemplateVersion();
+        existingVersion.setVersionNumber(1);
+        existingVersion.setActiveVersion(true);
+        template.addVersion(existingVersion);
+
         ChecklistTemplateCreateDTO updateDTO = new ChecklistTemplateCreateDTO();
         updateDTO.setCode("TMP-001");
         updateDTO.setName("Actualizado");
         updateDTO.setDescription("Desc");
 
         when(templateRepository.findById(1L)).thenReturn(Optional.of(template));
+        when(versionRepository.findTopByTemplateIdOrderByVersionNumberDesc(1L))
+                .thenReturn(Optional.of(existingVersion));
         when(templateRepository.save(any(ChecklistTemplate.class))).thenReturn(template);
 
         ChecklistTemplateDTO result = templateService.update(1L, updateDTO);
 
         assertNotNull(result);
         assertEquals("TMP-001", result.getCode());
+        assertEquals(2, result.getCurrentVersionNumber());
         verify(templateRepository, never()).existsByCode(any());
     }
 
@@ -203,5 +228,87 @@ class ChecklistTemplateServiceTest {
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void shouldFindVersionsByTemplateId() {
+        ChecklistTemplate template = new ChecklistTemplate();
+        template.setId(1L);
+        template.setCode("TMP-001");
+
+        ChecklistTemplateVersion version = new ChecklistTemplateVersion();
+        version.setId(10L);
+        version.setTemplate(template);
+        version.setVersionNumber(1);
+        version.setActiveVersion(true);
+
+        when(templateRepository.existsById(1L)).thenReturn(true);
+        when(versionRepository.findByTemplateIdOrderByVersionNumberDesc(1L))
+                .thenReturn(List.of(version));
+
+        List<ChecklistTemplateVersionDTO> result = templateService.findVersionsByTemplateId(1L);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(10L, result.get(0).getId());
+        assertEquals(1, result.get(0).getVersionNumber());
+        assertTrue(result.get(0).getActiveVersion());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenFindingVersionsForNonExistentTemplate() {
+        when(templateRepository.existsById(999L)).thenReturn(false);
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> templateService.findVersionsByTemplateId(999L));
+    }
+
+    @Test
+    void shouldFindVersionById() {
+        ChecklistTemplate template = new ChecklistTemplate();
+        template.setId(1L);
+        template.setCode("TMP-001");
+
+        ChecklistTemplateVersion version = new ChecklistTemplateVersion();
+        version.setId(10L);
+        version.setTemplate(template);
+        version.setVersionNumber(2);
+
+        when(templateRepository.existsById(1L)).thenReturn(true);
+        when(versionRepository.findById(10L)).thenReturn(Optional.of(version));
+
+        ChecklistTemplateVersionDTO result = templateService.findVersionById(1L, 10L);
+
+        assertNotNull(result);
+        assertEquals(10L, result.getId());
+        assertEquals(2, result.getVersionNumber());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenVersionNotFound() {
+        when(templateRepository.existsById(1L)).thenReturn(true);
+        when(versionRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> templateService.findVersionById(1L, 999L));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenVersionNotBelongingToTemplate() {
+        ChecklistTemplate template = new ChecklistTemplate();
+        template.setId(1L);
+
+        ChecklistTemplate otherTemplate = new ChecklistTemplate();
+        otherTemplate.setId(2L);
+
+        ChecklistTemplateVersion version = new ChecklistTemplateVersion();
+        version.setId(10L);
+        version.setTemplate(otherTemplate);
+
+        when(templateRepository.existsById(1L)).thenReturn(true);
+        when(versionRepository.findById(10L)).thenReturn(Optional.of(version));
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> templateService.findVersionById(1L, 10L));
     }
 }

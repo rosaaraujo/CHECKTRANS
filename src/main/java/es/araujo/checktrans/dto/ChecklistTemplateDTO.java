@@ -1,5 +1,6 @@
 package es.araujo.checktrans.dto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class ChecklistTemplateDTO {
@@ -9,6 +10,8 @@ public class ChecklistTemplateDTO {
     private String name;
     private String description;
     private Boolean active;
+    private Integer currentVersionNumber;
+    private LocalDate currentVersionDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -53,6 +56,22 @@ public class ChecklistTemplateDTO {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public Integer getCurrentVersionNumber() {
+        return currentVersionNumber;
+    }
+
+    public void setCurrentVersionNumber(Integer currentVersionNumber) {
+        this.currentVersionNumber = currentVersionNumber;
+    }
+
+    public LocalDate getCurrentVersionDate() {
+        return currentVersionDate;
+    }
+
+    public void setCurrentVersionDate(LocalDate currentVersionDate) {
+        this.currentVersionDate = currentVersionDate;
     }
 
     public LocalDateTime getCreatedAt() {

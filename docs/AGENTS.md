@@ -53,7 +53,8 @@ checktrans/
 │   │   │   │   ├── ChecklistCreateDTO.java
 │   │   │   │   ├── ChecklistItemDTO.java
 │   │   │   │   ├── ChecklistTemplateDTO.java
-│   │   │   │   └── ChecklistTemplateCreateDTO.java
+│   │   │   │   ├── ChecklistTemplateCreateDTO.java
+│   │   │   │   └── ChecklistTemplateVersionDTO.java
 │   │   │   ├── exception/
 │   │   │   │   ├── ResourceNotFoundException.java
 │   │   │   │   ├── DuplicateCodeException.java
@@ -102,7 +103,9 @@ checktrans/
 │   │           └── template/
 │   │               ├── list.html
 │   │               ├── form.html
-│   │               └── detail.html
+│   │               ├── detail.html
+│   │               ├── versions.html
+│   │               └── version-detail.html
 │   └── test/
 │       ├── java/es/araujo/checktrans/
 │       │   ├── ChecktransApplicationTests.java
@@ -201,7 +204,7 @@ docker compose up --build
 | 3    | Completada  | Sistema visual corporativo                      |
 | 4    | Completada  | Modelo JPA de plantillas (templates)            |
 | 5    | Completada  | Gestión de plantillas (CRUD servicios/vistas)   |
-| 6    | Pendiente   | Autenticación y autorización (Spring Security)  |
+| 6    | Completada  | Versionado de plantillas                        |
 | 7    | Pendiente   | Ejecución de listas de chequeo                  |
 | 8    | Pendiente   | Dashboard y reportes                            |
 | 9    | Pendiente   | API REST                                        |
@@ -210,8 +213,8 @@ docker compose up --build
 
 ## Fase Actual
 
-**Fase 5**: Gestión de plantillas CRUD (completada)
-**Siguiente**: Fase 6 — Autenticación y autorización (Spring Security)
+**Fase 6**: Versionado de plantillas (completada)
+**Siguiente**: Fase 7 — Autenticación y autorización (Spring Security)
 
 ## Archivos Creados en Fase 4
 
@@ -230,6 +233,14 @@ docker compose up --build
 | `src/main/java/.../repository/template/ChecklistTemplateItemRepository.java` | Repositorio con findByPhaseIdOrderByItemOrderAsc |
 | `src/test/java/.../repository/template/ChecklistTemplateRepositoryTest.java` | 14 tests de integración JPA: CRUD, relaciones, cascada, tipos de ítem, transición de estados |
 
+## Archivos Creados en Fase 6
+
+| Archivo | Propósito |
+|---------|-----------|
+| `src/main/java/.../dto/ChecklistTemplateVersionDTO.java` | DTO de versión con id, templateId, templateCode, templateName, versionNumber, activeVersion, status, publicationDate, effectiveDate, createdAt, updatedAt |
+| `src/main/resources/templates/template/versions.html` | Vista de historial de versiones con tabla responsive, badges de estado (CREADA/VERIFICADA/COMPROBADA/ANULADA), columna activa, paginación implícita |
+| `src/main/resources/templates/template/version-detail.html` | Vista de detalle de versión con número, estado, activa, fechas de publicación y efectividad |
+
 ## Archivos Creados en Fase 5
 
 | Archivo | Propósito |
@@ -245,6 +256,20 @@ docker compose up --build
 | `src/test/java/.../controller/ChecklistTemplateControllerTest.java` | 9 tests MVC con MockMvc: list, create form, create success, validation errors, detail, edit form, update, update validation errors, deactivate |
 | `src/test/java/.../service/ChecklistTemplateServiceTest.java` | 11 tests unitarios con Mockito: create, duplicate code on create, findById, not found, update, duplicate code on update, update same code, deactivate, deactivate not found, pagination, searchByName |
 
+## Modificaciones en Fase 6
+
+| Archivo | Cambio |
+|---------|--------|
+| `src/main/java/.../domain/template/ChecklistTemplateVersion.java` | Se añadieron campos `activeVersion` (Boolean) y `publicationDate` (LocalDate) |
+| `src/main/java/.../dto/ChecklistTemplateDTO.java` | Se añadieron campos `currentVersionNumber` (Integer) y `currentVersionDate` (LocalDate) |
+| `src/main/java/.../service/ChecklistTemplateService.java` | `create()` ahora crea versión inicial (v1, activa, fecha actual); `update()` crea nueva versión (versionNumber+1), la marca activa y desactiva las anteriores; nuevos métodos `findVersionsByTemplateId()` y `findVersionById()` |
+| `src/main/java/.../controller/ChecklistTemplateController.java` | Nuevos endpoints `GET /{id}/versions` (historial) y `GET /{id}/versions/{versionId}` (detalle versión) |
+| `src/main/resources/templates/template/detail.html` | Añadida sección "Versión Actual" con número y fecha; botón "Historial de Versiones" |
+| `src/main/resources/templates/template/list.html` | Añadida columna "Versión" con badge v{N} |
+| `src/test/java/.../service/ChecklistTemplateServiceTest.java` | 16 tests: actualizados create/update para verificar creación de versiones; nuevos tests: findVersionsByTemplateId, findVersionById, version mismatch |
+| `src/test/java/.../controller/ChecklistTemplateControllerTest.java` | 11 tests: nuevos tests para version history y version detail endpoints |
+| `src/test/java/.../repository/template/ChecklistTemplateRepositoryTest.java` | Actualizados todos los tests de versión para incluir activeVersion y publicationDate |
+
 ## Notas Técnicas
 
 ### JPA y Hibernate
@@ -259,9 +284,18 @@ ChecklistTemplate (1) ─── * ChecklistTemplateVersion (1) ─── * Check
 ```
 
 ### Tests
-- **Totales**: 78 (58 anteriores + 11 service + 9 controller), BUILD SUCCESS.
+- **Totales**: 85 (78 anteriores + 5 service + 2 controller), BUILD SUCCESS.
 - Fase 4: 14 tests de integración cubren CRUD por código, activos, versiones, fases, ítems, cascade delete, variantes de ItemType, transición de ChecklistExecutionStatus.
 - Fase 5: 11 tests unitarios de servicio (Mockito) + 9 tests MVC (MockMvc) cubren CRUD completo, validación, búsqueda, soft delete.
+- Fase 6: 5 nuevos tests unitarios de servicio (findVersionsByTemplateId, findVersionById, version mismatch, error cases) + 2 nuevos tests MVC (version history, version detail). 16 tests de servicio total + 11 tests MVC total.
+
+### Versionado de Plantillas (Fase 6)
+- `ChecklistTemplate.create()` crea automáticamente la versión inicial (v1) con `activeVersion=true` y `publicationDate=LocalDate.now()`.
+- `ChecklistTemplate.update()` calcula el siguiente `versionNumber` (`findTopByTemplateIdOrderByVersionNumberDesc + 1`), crea una nueva versión activa, y marca todas las demás versiones como inactivas.
+- Las versiones se almacenan en la relación `@OneToMany` dentro de `ChecklistTemplate` y se persisten en cascada.
+- La columna `active_version` en `checklist_template_versions` permite identificar rápidamente la versión activa de una plantilla.
+- `ChecklistTemplateDTO` incluye `currentVersionNumber` y `currentVersionDate` para mostrar en listados y detalle.
+- Versión detalle muestra: número de versión, estado, activa/inactiva, fecha de publicación, fecha de efectividad, timestamps de auditoría.
 
 ### JaCoCo
 - Configurado con `prepare-agent` (pre-test) y `report` (post-test, fase `test`). Reporte HTML en `target/site/jacoco/index.html`. El argumento del agente se pasa a Surefire vía `<argLine>${jacoco.agent.argLine}</argLine>`.

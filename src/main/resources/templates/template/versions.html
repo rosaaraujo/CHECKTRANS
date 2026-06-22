@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}"
+      lang="es">
+<head>
+    <title>CHECKTRANS - Historial</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/}">Inicio</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/templates}">Plantillas</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/templates/{id}(id=${template.id})}" th:text="${template.code}">TMP-001</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Versiones</li>
+                    </ol>
+                </nav>
+                <h1>
+                    Historial de Versiones
+                    <small class="text-muted fs-5" th:text="|${template.code} - ${template.name}|">TMP-001</small>
+                </h1>
+            </div>
+            <div class="page-actions">
+                <a th:href="@{/templates/{id}(id=${template.id})}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Volver
+                </a>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(versions)}">
+            <div class="card card-checktrans">
+                <div class="card-body">
+                    <div class="empty-state">
+                        <i class="fas fa-history"></i>
+                        <h5>No hay versiones</h5>
+                        <p>Esta plantilla a&uacute;n no tiene versiones</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${not #lists.isEmpty(versions)}">
+            <div class="card card-checktrans">
+                <div class="table-responsive">
+                    <table class="table table-checktrans">
+                        <thead>
+                            <tr>
+                                <th>Versi&oacute;n</th>
+                                <th>Estado</th>
+                                <th>Fecha de Publicaci&oacute;n</th>
+                                <th>Activa</th>
+                                <th class="d-none d-md-table-cell">Creado</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="version : ${versions}">
+                                <td data-label="Versi&oacute;n">
+                                    <strong th:text="'v' + ${version.versionNumber}">v1</strong>
+                                </td>
+                                <td data-label="Estado">
+                                    <span th:if="${version.status == 'CREADA'}" class="badge bg-secondary" th:text="${version.status}">CREADA</span>
+                                    <span th:if="${version.status == 'VERIFICADA'}" class="badge bg-info" th:text="${version.status}">VERIFICADA</span>
+                                    <span th:if="${version.status == 'COMPROBADA'}" class="badge bg-success" th:text="${version.status}">COMPROBADA</span>
+                                    <span th:if="${version.status == 'ANULADA'}" class="badge bg-danger" th:text="${version.status}">ANULADA</span>
+                                </td>
+                                <td data-label="Fecha de Publicaci&oacute;n" th:text="${version.publicationDate} ? ${#temporals.format(version.publicationDate, 'dd/MM/yyyy')} : '-'">
+                                    01/01/2024
+                                </td>
+                                <td data-label="Activa">
+                                    <span th:if="${version.activeVersion}" class="badge badge-status badge-completed">
+                                        <i class="fas fa-check me-1"></i>SI
+                                    </span>
+                                    <span th:unless="${version.activeVersion}" class="text-muted">-</span>
+                                </td>
+                                <td data-label="Creado" class="d-none d-md-table-cell"
+                                    th:text="${#temporals.format(version.createdAt, 'dd/MM/yyyy HH:mm')}">
+                                    01/01/2024 12:00
+                                </td>
+                                <td data-label="Acciones" class="text-end">
+                                    <a th:href="@{/templates/{id}/versions/{versionId}(id=${version.templateId}, versionId=${version.id})}"
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -2,8 +2,10 @@ package es.araujo.checktrans.controller;
 
 import es.araujo.checktrans.dto.ChecklistTemplateCreateDTO;
 import es.araujo.checktrans.dto.ChecklistTemplateDTO;
+import es.araujo.checktrans.dto.ChecklistTemplateVersionDTO;
 import es.araujo.checktrans.service.ChecklistTemplateService;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +29,8 @@ public class ChecklistTemplateController {
     private static final String VIEW_LIST = "template/list";
     private static final String VIEW_FORM = "template/form";
     private static final String VIEW_DETAIL = "template/detail";
+    private static final String VIEW_VERSIONS = "template/versions";
+    private static final String VIEW_VERSION_DETAIL = "template/version-detail";
 
     private final ChecklistTemplateService templateService;
 
@@ -115,5 +119,21 @@ public class ChecklistTemplateController {
         templateService.deactivate(id);
         redirectAttributes.addFlashAttribute("success", "Plantilla desactivada correctamente");
         return REDIRECT_TEMPLATES;
+    }
+
+    @GetMapping("/{id}/versions")
+    public String listVersions(@PathVariable Long id, Model model) {
+        ChecklistTemplateDTO template = templateService.findById(id);
+        List<ChecklistTemplateVersionDTO> versions = templateService.findVersionsByTemplateId(id);
+        model.addAttribute("template", template);
+        model.addAttribute("versions", versions);
+        return VIEW_VERSIONS;
+    }
+
+    @GetMapping("/{id}/versions/{versionId}")
+    public String versionDetail(@PathVariable Long id, @PathVariable Long versionId, Model model) {
+        ChecklistTemplateVersionDTO version = templateService.findVersionById(id, versionId);
+        model.addAttribute("version", version);
+        return VIEW_VERSION_DETAIL;
     }
 }

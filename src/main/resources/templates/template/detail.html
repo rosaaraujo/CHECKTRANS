@@ -58,6 +58,14 @@
                                 <label class="text-muted small">Nombre</label>
                                 <p class="fw-bold mb-0" th:text="${template.name}">Nombre</p>
                             </div>
+                            <div th:if="${template.currentVersionNumber}" class="col-md-6 mb-3">
+                                <label class="text-muted small">Versi&oacute;n Actual</label>
+                                <p class="fw-bold mb-0">
+                                    <span th:text="'v' + ${template.currentVersionNumber}"></span>
+                                    <span th:if="${template.currentVersionDate}" class="text-muted fw-normal"
+                                          th:text="' (' + ${#temporals.format(template.currentVersionDate, 'dd/MM/yyyy')} + ')'"></span>
+                                </p>
+                            </div>
                         </div>
 
                         <div th:if="${template.description}" class="mt-2">
@@ -87,6 +95,11 @@
                         <a th:href="@{/templates/{id}/edit(id=${template.id})}"
                            class="btn btn-primary w-100 mb-2">
                             <i class="fas fa-edit me-1"></i>Editar Plantilla
+                        </a>
+
+                        <a th:href="@{/templates/{id}/versions(id=${template.id})}"
+                           class="btn btn-outline-info w-100 mb-2">
+                            <i class="fas fa-history me-1"></i>Historial de Versiones
                         </a>
 
                         <form th:action="@{/templates/{id}/deactivate(id=${template.id})}" method="post"

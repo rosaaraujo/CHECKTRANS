@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import es.araujo.checktrans.dto.ChecklistTemplateCreateDTO;
 import es.araujo.checktrans.dto.ChecklistTemplateDTO;
+import es.araujo.checktrans.dto.ChecklistTemplateVersionDTO;
 import es.araujo.checktrans.service.ChecklistTemplateService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -134,5 +135,36 @@ class ChecklistTemplateControllerTest {
         mockMvc.perform(post("/templates/1/deactivate"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/templates"));
+    }
+
+    @Test
+    void shouldShowVersionHistory() throws Exception {
+        ChecklistTemplateDTO templateDto = new ChecklistTemplateDTO();
+        templateDto.setId(1L);
+        templateDto.setCode("TMP-001");
+
+        when(templateService.findById(1L)).thenReturn(templateDto);
+        when(templateService.findVersionsByTemplateId(1L)).thenReturn(List.of());
+
+        mockMvc.perform(get("/templates/1/versions"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("template/versions"))
+                .andExpect(model().attributeExists("template"))
+                .andExpect(model().attributeExists("versions"));
+    }
+
+    @Test
+    void shouldShowVersionDetail() throws Exception {
+        ChecklistTemplateVersionDTO versionDto = new ChecklistTemplateVersionDTO();
+        versionDto.setId(10L);
+        versionDto.setTemplateId(1L);
+        versionDto.setVersionNumber(2);
+
+        when(templateService.findVersionById(1L, 10L)).thenReturn(versionDto);
+
+        mockMvc.perform(get("/templates/1/versions/10"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("template/version-detail"))
+                .andExpect(model().attributeExists("version"));
     }
 }

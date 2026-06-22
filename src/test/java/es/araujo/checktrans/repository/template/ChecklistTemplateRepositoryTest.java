@@ -44,7 +44,9 @@ class ChecklistTemplateRepositoryTest {
         ChecklistTemplateVersion version = new ChecklistTemplateVersion();
         version.setTemplate(template);
         version.setVersionNumber(1);
+        version.setActiveVersion(true);
         version.setStatus(ChecklistExecutionStatus.CREADA);
+        version.setPublicationDate(LocalDate.now());
         version.setEffectiveDate(LocalDate.now());
         return versionRepository.save(version);
     }
@@ -117,7 +119,9 @@ class ChecklistTemplateRepositoryTest {
 
         assertNotNull(version.getId());
         assertEquals(1, version.getVersionNumber());
+        assertTrue(version.getActiveVersion());
         assertEquals(ChecklistExecutionStatus.CREADA, version.getStatus());
+        assertNotNull(version.getPublicationDate());
         assertNotNull(version.getEffectiveDate());
     }
 
@@ -129,6 +133,8 @@ class ChecklistTemplateRepositoryTest {
         ChecklistTemplateVersion version2 = new ChecklistTemplateVersion();
         version2.setTemplate(template);
         version2.setVersionNumber(2);
+        version2.setActiveVersion(false);
+        version2.setPublicationDate(LocalDate.now());
         version2.setStatus(ChecklistExecutionStatus.COMPROBADA);
         versionRepository.save(version2);
 
@@ -147,6 +153,8 @@ class ChecklistTemplateRepositoryTest {
         ChecklistTemplateVersion version2 = new ChecklistTemplateVersion();
         version2.setTemplate(template);
         version2.setVersionNumber(2);
+        version2.setActiveVersion(true);
+        version2.setPublicationDate(LocalDate.now());
         versionRepository.save(version2);
 
         ChecklistTemplateVersion latest = versionRepository
@@ -229,6 +237,8 @@ class ChecklistTemplateRepositoryTest {
 
         ChecklistTemplateVersion version = new ChecklistTemplateVersion();
         version.setVersionNumber(1);
+        version.setActiveVersion(true);
+        version.setPublicationDate(LocalDate.now());
         version.setStatus(ChecklistExecutionStatus.CREADA);
 
         ChecklistPhase phase = new ChecklistPhase();
@@ -284,6 +294,8 @@ class ChecklistTemplateRepositoryTest {
         ChecklistTemplateVersion version = new ChecklistTemplateVersion();
         version.setTemplate(template);
         version.setVersionNumber(1);
+        version.setActiveVersion(true);
+        version.setPublicationDate(LocalDate.now());
         version.setStatus(ChecklistExecutionStatus.CREADA);
         version = versionRepository.save(version);
 
