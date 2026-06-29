@@ -173,6 +173,7 @@ public class ChecklistTemplateService {
                 .filter(ChecklistTemplateVersion::getActiveVersion)
                 .findFirst()
                 .ifPresent(v -> {
+                    dto.setCurrentVersionId(v.getId());
                     dto.setCurrentVersionNumber(v.getVersionNumber());
                     dto.setCurrentVersionDate(v.getPublicationDate());
                 });

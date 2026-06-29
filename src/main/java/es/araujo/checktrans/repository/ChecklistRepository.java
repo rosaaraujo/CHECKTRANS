@@ -16,11 +16,7 @@ public interface ChecklistRepository extends JpaRepository<Checklist, Long> {
 
     Page<Checklist> findByInspectorNameContainingIgnoreCase(String inspectorName, Pageable pageable);
 
-    Page<Checklist> findByTransportPlateContainingIgnoreCase(String transportPlate, Pageable pageable);
-
     List<Checklist> findByInspectorNameContainingIgnoreCaseOrderByCheckDateDesc(String inspectorName);
-
-    List<Checklist> findByTransportPlateContainingIgnoreCaseOrderByCheckDateDesc(String transportPlate);
 
     List<Checklist> findByStatusOrderByCheckDateDesc(ChecklistStatus status);
 

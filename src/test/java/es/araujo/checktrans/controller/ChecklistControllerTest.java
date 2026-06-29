@@ -7,7 +7,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import es.araujo.checktrans.domain.enums.ChecklistStatus;
 import es.araujo.checktrans.dto.ChecklistDTO;
+import es.araujo.checktrans.dto.ChecklistTemplateDTO;
 import es.araujo.checktrans.service.ChecklistService;
+import es.araujo.checktrans.service.ChecklistTemplateService;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -30,6 +32,9 @@ class ChecklistControllerTest {
     @MockitoBean
     private ChecklistService checklistService;
 
+    @MockitoBean
+    private ChecklistTemplateService templateService;
+
     @Test
     void shouldShowListPage() throws Exception {
         Page<ChecklistDTO> emptyPage = new PageImpl<>(List.of(), PageRequest.of(0, 10), 0);
@@ -43,6 +48,9 @@ class ChecklistControllerTest {
 
     @Test
     void shouldShowCreateForm() throws Exception {
+        Page<ChecklistTemplateDTO> emptyTemplates = new PageImpl<>(List.of(), PageRequest.of(0, 10), 0);
+        when(templateService.findAll(any(Pageable.class))).thenReturn(emptyTemplates);
+
         mockMvc.perform(get("/checklists/new"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("checklist/form"))
@@ -54,8 +62,6 @@ class ChecklistControllerTest {
         ChecklistDTO dto = new ChecklistDTO();
         dto.setId(1L);
         dto.setCode("CT-001");
-        dto.setTransportPlate("1234ABC");
-        dto.setTransportType("TRUCK");
         dto.setInspectorName("Inspector 1");
         dto.setCheckDate(LocalDateTime.now());
         dto.setStatus(ChecklistStatus.DRAFT);

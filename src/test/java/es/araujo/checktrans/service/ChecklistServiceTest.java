@@ -11,6 +11,9 @@ import es.araujo.checktrans.dto.ChecklistDTO;
 import es.araujo.checktrans.exception.DuplicateCodeException;
 import es.araujo.checktrans.exception.ResourceNotFoundException;
 import es.araujo.checktrans.repository.ChecklistRepository;
+import es.araujo.checktrans.repository.template.ChecklistTemplateHeaderRepository;
+import es.araujo.checktrans.repository.template.ChecklistTemplateRepository;
+import es.araujo.checktrans.repository.template.ChecklistTemplateVersionRepository;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,19 +33,26 @@ class ChecklistServiceTest {
     @Mock
     private ChecklistRepository checklistRepository;
 
+    @Mock
+    private ChecklistTemplateRepository templateRepository;
+
+    @Mock
+    private ChecklistTemplateVersionRepository versionRepository;
+
+    @Mock
+    private ChecklistTemplateHeaderRepository headerRepository;
+
     private ChecklistService checklistService;
 
     @BeforeEach
     void setUp() {
-        checklistService = new ChecklistService(checklistRepository);
+        checklistService = new ChecklistService(checklistRepository, templateRepository, versionRepository, headerRepository);
     }
 
     @Test
     void shouldCreateChecklist() {
         ChecklistCreateDTO createDTO = new ChecklistCreateDTO();
         createDTO.setCode("CT-001");
-        createDTO.setTransportPlate("1234ABC");
-        createDTO.setTransportType("TRUCK");
         createDTO.setInspectorName("Inspector 1");
         createDTO.setCheckDate(LocalDateTime.now());
 
@@ -58,7 +68,6 @@ class ChecklistServiceTest {
 
         assertNotNull(result);
         assertEquals("CT-001", result.getCode());
-        assertEquals("1234ABC", result.getTransportPlate());
         assertEquals(ChecklistStatus.DRAFT, result.getStatus());
         verify(checklistRepository).save(any(Checklist.class));
     }
@@ -79,8 +88,6 @@ class ChecklistServiceTest {
         Checklist checklist = new Checklist();
         checklist.setId(1L);
         checklist.setCode("CT-001");
-        checklist.setTransportPlate("1234ABC");
-        checklist.setTransportType("TRUCK");
         checklist.setInspectorName("Inspector 1");
         checklist.setCheckDate(LocalDateTime.now());
         checklist.setStatus(ChecklistStatus.DRAFT);
@@ -92,7 +99,6 @@ class ChecklistServiceTest {
 
         assertNotNull(result);
         assertEquals("CT-001", result.getCode());
-        assertEquals("1234ABC", result.getTransportPlate());
     }
 
     @Test
@@ -107,8 +113,6 @@ class ChecklistServiceTest {
         Checklist checklist = new Checklist();
         checklist.setId(1L);
         checklist.setCode("CT-001");
-        checklist.setTransportPlate("1234ABC");
-        checklist.setTransportType("TRUCK");
         checklist.setInspectorName("Inspector 1");
         checklist.setCheckDate(LocalDateTime.now());
         checklist.setStatus(ChecklistStatus.DRAFT);

@@ -14,14 +14,6 @@ public class ChecklistCreateDTO {
     @Size(max = 20, message = "{checklist.code.max}")
     private String code;
 
-    @NotBlank(message = "{checklist.transportPlate.required}")
-    @Size(max = 15, message = "{checklist.transportPlate.max}")
-    private String transportPlate;
-
-    @NotBlank(message = "{checklist.transportType.required}")
-    @Size(max = 20, message = "{checklist.transportType.max}")
-    private String transportType;
-
     @NotBlank(message = "{checklist.inspectorName.required}")
     @Size(max = 100, message = "{checklist.inspectorName.max}")
     private String inspectorName;
@@ -31,6 +23,8 @@ public class ChecklistCreateDTO {
 
     @Size(max = 2000, message = "{checklist.observations.max}")
     private String observations;
+
+    private Long templateId;
 
     @Valid
     private List<ChecklistItemDTO> items = new ArrayList<>();
@@ -44,22 +38,6 @@ public class ChecklistCreateDTO {
 
     public void setCode(String code) {
         this.code = code;
-    }
-
-    public String getTransportPlate() {
-        return transportPlate;
-    }
-
-    public void setTransportPlate(String transportPlate) {
-        this.transportPlate = transportPlate;
-    }
-
-    public String getTransportType() {
-        return transportType;
-    }
-
-    public void setTransportType(String transportType) {
-        this.transportType = transportType;
     }
 
     public String getInspectorName() {
@@ -92,5 +70,13 @@ public class ChecklistCreateDTO {
 
     public void setItems(List<ChecklistItemDTO> items) {
         this.items = items;
+    }
+
+    public Long getTemplateId() {
+        return templateId;
+    }
+
+    public void setTemplateId(Long templateId) {
+        this.templateId = templateId;
     }
 }

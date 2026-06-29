@@ -68,8 +68,6 @@
                         <thead>
                             <tr>
                                 <th>C&oacute;digo</th>
-                                <th>Matr&iacute;cula</th>
-                                <th class="d-none d-md-table-cell">Tipo</th>
                                 <th>Inspector</th>
                                 <th class="d-none d-md-table-cell">Fecha</th>
                                 <th>Estado</th>
@@ -81,8 +79,6 @@
                                 <td data-label="C&oacute;digo">
                                     <strong th:text="${checklist.code}">CT-001</strong>
                                 </td>
-                                <td data-label="Matr&iacute;cula" th:text="${checklist.transportPlate}">1234ABC</td>
-                                <td data-label="Tipo" class="d-none d-md-table-cell" th:text="${checklist.transportType}">TRUCK</td>
                                 <td data-label="Inspector" th:text="${checklist.inspectorName}">Inspector</td>
                                 <td data-label="Fecha" class="d-none d-md-table-cell"
                                     th:text="${#temporals.format(checklist.checkDate, 'dd/MM/yyyy HH:mm')}">01/01/2026</td>

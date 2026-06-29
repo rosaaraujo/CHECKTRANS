@@ -22,8 +22,6 @@ class ChecklistRepositoryTest {
     void shouldSaveAndFindChecklist() {
         Checklist checklist = new Checklist();
         checklist.setCode("CT-001");
-        checklist.setTransportPlate("1234ABC");
-        checklist.setTransportType("TRUCK");
         checklist.setInspectorName("Inspector 1");
         checklist.setCheckDate(LocalDateTime.now());
         checklist.setStatus(ChecklistStatus.DRAFT);
@@ -39,8 +37,6 @@ class ChecklistRepositoryTest {
     void shouldCheckCodeExistence() {
         Checklist checklist = new Checklist();
         checklist.setCode("CT-UNIQUE");
-        checklist.setTransportPlate("1234ABC");
-        checklist.setTransportType("TRUCK");
         checklist.setInspectorName("Inspector 1");
         checklist.setCheckDate(LocalDateTime.now());
         checklist.setStatus(ChecklistStatus.DRAFT);
@@ -55,8 +51,6 @@ class ChecklistRepositoryTest {
     void shouldFindByInspectorName() {
         Checklist checklist = new Checklist();
         checklist.setCode("CT-002");
-        checklist.setTransportPlate("5678DEF");
-        checklist.setTransportType("VAN");
         checklist.setInspectorName("Juan Perez");
         checklist.setCheckDate(LocalDateTime.now());
         checklist.setStatus(ChecklistStatus.DRAFT);
@@ -71,11 +65,9 @@ class ChecklistRepositoryTest {
     }
 
     @Test
-    void shouldFindByPlate() {
+    void shouldFindByInspector() {
         Checklist checklist = new Checklist();
         checklist.setCode("CT-003");
-        checklist.setTransportPlate("9999ZZZ");
-        checklist.setTransportType("TRAILER");
         checklist.setInspectorName("Maria Lopez");
         checklist.setCheckDate(LocalDateTime.now());
         checklist.setStatus(ChecklistStatus.DRAFT);
@@ -83,7 +75,7 @@ class ChecklistRepositoryTest {
         checklistRepository.save(checklist);
 
         List<Checklist> result = checklistRepository
-                .findByTransportPlateContainingIgnoreCaseOrderByCheckDateDesc("9999");
+                .findByInspectorNameContainingIgnoreCaseOrderByCheckDateDesc("maria");
 
         assertEquals(1, result.size());
         assertEquals("CT-003", result.get(0).getCode());

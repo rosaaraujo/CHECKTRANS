@@ -89,6 +89,10 @@
                                             </button>
                                         </form>
                                     </div>
+                                    <a th:href="@{/templates/{id}/versions/{vId}/phases/{pId}/items(id=${version.templateId}, vId=${version.id}, pId=${phase.id})}"
+                                       class="btn btn-sm btn-outline-info" th:title="Items">
+                                        <i class="fas fa-list-check"></i>
+                                    </a>
                                     <a th:href="@{/templates/{id}/versions/{vId}/phases/{pId}/edit(id=${version.templateId}, vId=${version.id}, pId=${phase.id})}"
                                        class="btn btn-sm btn-outline-primary">
                                         <i class="fas fa-edit"></i>

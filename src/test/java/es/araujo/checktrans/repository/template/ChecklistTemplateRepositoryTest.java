@@ -64,6 +64,7 @@ class ChecklistTemplateRepositoryTest {
     private ChecklistItem createSampleItem(ChecklistPhase phase) {
         ChecklistItem item = new ChecklistItem();
         item.setPhase(phase);
+        item.setCode("ITEM-001");
         item.setItemOrder(1);
         item.setDescription("¿El vehículo tiene documentación en regla?");
         item.setItemType(ItemType.YES_NO_NA);
@@ -217,6 +218,7 @@ class ChecklistTemplateRepositoryTest {
 
         ChecklistItem item2 = new ChecklistItem();
         item2.setPhase(phase);
+        item2.setCode("ITEM-002");
         item2.setItemOrder(2);
         item2.setDescription("¿Cuál es la matrícula?");
         item2.setItemType(ItemType.TEXT);
@@ -250,6 +252,7 @@ class ChecklistTemplateRepositoryTest {
         phase.setName("Phase 1");
 
         ChecklistItem item = new ChecklistItem();
+        item.setCode("ITEM-001");
         item.setItemOrder(1);
         item.setDescription("Item 1");
         item.setItemType(ItemType.TEXT);
@@ -281,6 +284,7 @@ class ChecklistTemplateRepositoryTest {
         for (ItemType type : ItemType.values()) {
             ChecklistItem item = new ChecklistItem();
             item.setPhase(phase);
+            item.setCode("ITEM-" + type.ordinal());
             item.setItemOrder(type.ordinal() + 1);
             item.setDescription("Item " + type);
             item.setItemType(type);

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}"
+      lang="es">
+<head>
+    <title>CHECKTRANS - Cabeceras</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/}">Inicio</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/templates}">Plantillas</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/templates/{id}(id=${template.id})}" th:text="${template.code}">TMP-001</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Cabeceras</li>
+                    </ol>
+                </nav>
+                <h1>
+                    Cabeceras de <span th:text="${template.code}">TMP-001</span>
+                </h1>
+            </div>
+            <div class="page-actions">
+                <a th:href="@{/templates/{id}/headers/new(id=${template.id})}" class="btn btn-accent">
+                    <i class="fas fa-plus me-1"></i>Nueva Cabecera
+                </a>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(headers)}">
+            <div class="card card-checktrans">
+                <div class="card-body">
+                    <div class="empty-state">
+                        <i class="fas fa-heading"></i>
+                        <h5>No hay cabeceras</h5>
+                        <p>Defina las cabeceras que se rellenar&aacute;n en cada ejecuci&oacute;n de esta plantilla</p>
+                        <a th:href="@{/templates/{id}/headers/new(id=${template.id})}" class="btn btn-accent mt-2">
+                            <i class="fas fa-plus me-1"></i>Crear Primera Cabecera
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${not #lists.isEmpty(headers)}">
+            <div class="card card-checktrans">
+                <div class="table-responsive">
+                    <table class="table table-checktrans">
+                        <thead>
+                            <tr>
+                                <th>Orden</th>
+                                <th>C&oacute;digo</th>
+                                <th>Etiqueta</th>
+                                <th class="d-none d-md-table-cell">Tipo</th>
+                                <th class="d-none d-md-table-cell">Obligatorio</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="header : ${headers}">
+                                <td data-label="Orden">
+                                    <span class="badge bg-light text-dark" th:text="${header.headerOrder}">1</span>
+                                </td>
+                                <td data-label="C&oacute;digo">
+                                    <strong th:text="${header.code}">HDR-001</strong>
+                                </td>
+                                <td data-label="Etiqueta" th:text="${header.label}">Matr&iacute;cula</td>
+                                <td data-label="Tipo" class="d-none d-md-table-cell">
+                                    <span th:switch="${header.headerType}">
+                                        <span th:case="'TEXT'" class="badge badge-status badge-draft"><i class="fas fa-font me-1"></i>Texto</span>
+                                        <span th:case="'NUMBER'" class="badge badge-status badge-info"><i class="fas fa-hashtag me-1"></i>N&uacute;mero</span>
+                                        <span th:case="'DATE'" class="badge badge-status badge-primary"><i class="fas fa-calendar me-1"></i>Fecha</span>
+                                        <span th:case="'SELECT'" class="badge badge-status badge-warning"><i class="fas fa-list me-1"></i>Selecci&oacute;n</span>
+                                    </span>
+                                </td>
+                                <td data-label="Obligatorio" class="d-none d-md-table-cell">
+                                    <span th:if="${header.required}" class="badge badge-status badge-completed">
+                                        <i class="fas fa-check me-1"></i>SI
+                                    </span>
+                                    <span th:unless="${header.required}" class="text-muted">NO</span>
+                                </td>
+                                <td data-label="Acciones" class="text-end">
+                                    <a th:href="@{/templates/{id}/headers/{hId}/edit(id=${template.id}, hId=${header.id})}"
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form th:action="@{/templates/{id}/headers/{hId}/delete(id=${template.id}, hId=${header.id})}"
+                                          method="post" class="d-inline"
+                                          onsubmit="return confirm('&iquest;Est&aacute; seguro de eliminar esta cabecera?')">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

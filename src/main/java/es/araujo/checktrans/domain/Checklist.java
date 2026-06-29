@@ -28,12 +28,6 @@ public class Checklist {
     @Column(nullable = false, unique = true, length = 20)
     private String code;
 
-    @Column(name = "transport_plate", nullable = false, length = 15)
-    private String transportPlate;
-
-    @Column(name = "transport_type", nullable = false, length = 20)
-    private String transportType;
-
     @Column(name = "inspector_name", nullable = false, length = 100)
     private String inspectorName;
 
@@ -53,8 +47,17 @@ public class Checklist {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(name = "template_id")
+    private Long templateId;
+
+    @Column(name = "template_name", length = 200)
+    private String templateName;
+
     @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChecklistItem> items = new ArrayList<>();
+
+    @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChecklistHeaderValue> headerValues = new ArrayList<>();
 
     public Checklist() {
     }
@@ -97,22 +100,6 @@ public class Checklist {
 
     public void setCode(String code) {
         this.code = code;
-    }
-
-    public String getTransportPlate() {
-        return transportPlate;
-    }
-
-    public void setTransportPlate(String transportPlate) {
-        this.transportPlate = transportPlate;
-    }
-
-    public String getTransportType() {
-        return transportType;
-    }
-
-    public void setTransportType(String transportType) {
-        this.transportType = transportType;
     }
 
     public String getInspectorName() {
@@ -169,5 +156,34 @@ public class Checklist {
 
     public void setItems(List<ChecklistItem> items) {
         this.items = items;
+    }
+
+    public Long getTemplateId() {
+        return templateId;
+    }
+
+    public void setTemplateId(Long templateId) {
+        this.templateId = templateId;
+    }
+
+    public String getTemplateName() {
+        return templateName;
+    }
+
+    public void setTemplateName(String templateName) {
+        this.templateName = templateName;
+    }
+
+    public List<ChecklistHeaderValue> getHeaderValues() {
+        return headerValues;
+    }
+
+    public void setHeaderValues(List<ChecklistHeaderValue> headerValues) {
+        this.headerValues = headerValues;
+    }
+
+    public void addHeaderValue(ChecklistHeaderValue headerValue) {
+        headerValues.add(headerValue);
+        headerValue.setChecklist(this);
     }
 }

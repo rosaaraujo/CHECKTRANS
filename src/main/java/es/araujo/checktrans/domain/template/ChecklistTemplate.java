@@ -28,6 +28,9 @@ public class ChecklistTemplate extends AuditableEntity {
     @OneToMany(mappedBy = "template", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChecklistTemplateVersion> versions = new ArrayList<>();
 
+    @OneToMany(mappedBy = "template", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChecklistTemplateHeader> headers = new ArrayList<>();
+
     public ChecklistTemplate() {
     }
 
@@ -79,5 +82,23 @@ public class ChecklistTemplate extends AuditableEntity {
 
     public void setVersions(List<ChecklistTemplateVersion> versions) {
         this.versions = versions;
+    }
+
+    public List<ChecklistTemplateHeader> getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(List<ChecklistTemplateHeader> headers) {
+        this.headers = headers;
+    }
+
+    public void addHeader(ChecklistTemplateHeader header) {
+        headers.add(header);
+        header.setTemplate(this);
+    }
+
+    public void removeHeader(ChecklistTemplateHeader header) {
+        headers.remove(header);
+        header.setTemplate(null);
     }
 }

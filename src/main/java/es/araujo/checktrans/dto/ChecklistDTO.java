@@ -8,15 +8,16 @@ public class ChecklistDTO {
 
     private Long id;
     private String code;
-    private String transportPlate;
-    private String transportType;
     private String inspectorName;
     private LocalDateTime checkDate;
     private ChecklistStatus status;
     private String observations;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Long templateId;
+    private String templateName;
     private List<ChecklistItemDTO> items;
+    private List<ChecklistHeaderValueDTO> headerValues;
 
     public ChecklistDTO() {
     }
@@ -35,22 +36,6 @@ public class ChecklistDTO {
 
     public void setCode(String code) {
         this.code = code;
-    }
-
-    public String getTransportPlate() {
-        return transportPlate;
-    }
-
-    public void setTransportPlate(String transportPlate) {
-        this.transportPlate = transportPlate;
-    }
-
-    public String getTransportType() {
-        return transportType;
-    }
-
-    public void setTransportType(String transportType) {
-        this.transportType = transportType;
     }
 
     public String getInspectorName() {
@@ -107,5 +92,29 @@ public class ChecklistDTO {
 
     public void setItems(List<ChecklistItemDTO> items) {
         this.items = items;
+    }
+
+    public Long getTemplateId() {
+        return templateId;
+    }
+
+    public void setTemplateId(Long templateId) {
+        this.templateId = templateId;
+    }
+
+    public String getTemplateName() {
+        return templateName;
+    }
+
+    public void setTemplateName(String templateName) {
+        this.templateName = templateName;
+    }
+
+    public List<ChecklistHeaderValueDTO> getHeaderValues() {
+        return headerValues;
+    }
+
+    public void setHeaderValues(List<ChecklistHeaderValueDTO> headerValues) {
+        this.headerValues = headerValues;
     }
 }

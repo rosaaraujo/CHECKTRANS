@@ -210,15 +210,76 @@ docker compose up --build
 | 5    | Completada  | Gestión de plantillas (CRUD servicios/vistas)   |
 | 6    | Completada  | Versionado de plantillas                        |
 | 7    | Completada  | Gestión de fases                                |
-| 8    | Pendiente   | Dashboard y reportes                            |
+| 8    | En progreso | Ejecución de Checklists + Dashboard + Documentos (Fase 8-B: cabeceras, creación desde plantilla, items extra en fase 0) |
 | 9    | Pendiente   | API REST                                        |
 | 10   | Pendiente   | Notificaciones y alertas                        |
 | 11   | Pendiente   | Despliegue en Railway                           |
 
+## Funcionalidades Principales (Completadas)
+
+### 1. Gestión de Plantillas (CRUD)
+- Creación, edición y eliminación de plantillas de checklist (`ChecklistTemplate`)
+- Cada plantilla contiene fases ordenadas (`ChecklistPhase`) y cada fase contiene ítems de verificación (`ChecklistItem`)
+- Definición de campos de cabecera (`CabeceraPlantilla`) con valores dinámicos opcionales
+- Gestión inline de fases e ítems vía REST API con modales Bootstrap
+
+### 2. Sistema de Versionado de Plantillas
+- Creación automática de versión inicial (v1) al crear una plantilla
+- Nueva versión por cada actualización (versionNumber+1), marcada como activa
+- Historial completo de versiones con estados: CREADA, VERIFICADA, COMPROBADA, ANULADA
+- Badges de estado, columna activa, fechas de publicación y efectividad
+
+### 3. Gestión de Fases
+- CRUD completo de fases dentro de cada versión de plantilla
+- Código único por fase dentro de cada versión (`@UniqueConstraint`)
+- Reordenación con moveUp/moveDown intercambiando phaseOrder
+- Vistas anidadas bajo `/templates/{templateId}/versions/{versionId}/phases`
+
+### 4. CRUD de Listas de Chequeo
+- Creación, edición, visualización y eliminación de listas de chequeo
+- Listado paginado con búsqueda por inspector y matrícula
+- Estados: DRAFT, COMPLETED, APPROVED, REJECTED
+
+### 5. Sistema Visual Corporativo
+- Paleta corporativa: azul marino oscuro (#1e3c78) como color primario
+- Navbar, footer y mensajes flash como fragmentos Thymeleaf reutilizables
+- Layout maestro (`layout.html`) con `layout:decorate`
+- Componentes: cards con gradiente, tablas corporativas, badges, empty-state
+- Diseño responsivo (mobile-first) con Bootstrap 5
+- Página demo con todos los componentes UI
+
+## Funcionalidades Pendientes (Próximas Fases)
+
+### 6. Ejecución de Checklists (Workflow) — Fase 8
+- Inicio de ejecución: selección de plantilla, nombre de ejecución y relleno de campos de cabecera
+- Evaluación fase por fase: cada ítem se califica como SI (correcto), NO (incorrecto) o NA (no aplica), con comentarios opcionales
+- Resumen previo a la finalización con conteo de SI/NO/NA por fase
+- Firma digital mediante pad HTML5 Canvas (captura de firma con ratón y táctil)
+- Finalización con guardado de firma como Base64 en base de datos
+- Visualización de ejecuciones completadas en modo solo lectura
+
+### 7. Generación de Documentos — Fase 8
+- **PDF**: documento profesional con logo corporativo, tabla de cabeceras, ítems codificados por color (SI=verde, NO=rojo, NA=gris), firma y sello, números de página, pie con versión y fecha
+- **Excel (XLSX)**: mismo contenido estructurado con estilos, celdas coloreadas, anchos de columna y bordes
+
+### 8. Histórico de Ejecuciones — Fase 8
+- Listado completo de ejecuciones con filtro por texto en cliente
+- Acceso a vista detallada, PDF y Excel desde el listado
+
+## Diseño de UI (Implementado)
+- Server-side rendering con Thymeleaf, sin frameworks SPA
+- Layout maestro (`fragments/layout.html`) con navbar, footer y mensajes flash
+- Bootstrap 5 como base con personalización extensa en `css/app.css`
+- Paleta de colores corporativa: azul marino oscuro (#1e3c78) como color primario
+- Codificación por color: verde para SI, rojo para NO, gris para NA
+- Diseño responsivo: las tablas colapsan a layout tipo card en móviles (<768px)
+- Micro-interacciones: sombras, escalas en hover, animación fadeInUp en tarjetas
+
 ## Fase Actual
 
 **Fase 7**: Gestión de fases (completada)
-**Siguiente**: Fase 8 — Ejecución de listas de chequeo
+**Fase 8 (8-B)**: Cabeceras de plantilla, creación de checklist desde plantilla con items extra en fase 0 (en progreso)
+**Siguiente**: Fase 8 — Ejecución de listas de chequeo + Dashboard y reportes
 
 ## Archivos Creados en Fase 4
 
@@ -297,6 +358,53 @@ docker compose up --build
 | `src/test/java/.../controller/ChecklistTemplateControllerTest.java` | 11 tests: nuevos tests para version history y version detail endpoints |
 | `src/test/java/.../repository/template/ChecklistTemplateRepositoryTest.java` | Actualizados todos los tests de versión para incluir activeVersion y publicationDate |
 
+## Archivos Creados en Fase 8-B
+
+| Archivo | Propósito |
+|---------|-----------|
+| `src/main/java/.../domain/enums/ChecklistHeaderType.java` | Enum TEXT, NUMBER, DATE, SELECT para tipos de cabecera de plantilla |
+| `src/main/java/.../domain/template/ChecklistTemplateHeader.java` | Entidad cabecera de plantilla con code, label, headerOrder, headerType, options, required y @ManyToOne->ChecklistTemplate |
+| `src/main/java/.../domain/ChecklistHeaderValue.java` | Entidad valor de cabecera en ejecución (headerId, headerCode, headerLabel, headerType, value, headerOrder) |
+| `src/main/java/.../dto/ChecklistTemplateHeaderDTO.java` | DTO de lectura para cabeceras de plantilla |
+| `src/main/java/.../dto/ChecklistTemplateHeaderCreateDTO.java` | DTO de creación/edición con Bean Validation |
+| `src/main/java/.../dto/ChecklistHeaderValueDTO.java` | DTO para valores de cabecera en ejecución |
+| `src/main/java/.../dto/PhaseGroupDTO.java` | DTO para agrupar items por fase (phaseOrder, phaseName, items) |
+| `src/main/java/.../repository/template/ChecklistTemplateHeaderRepository.java` | Repositorio con findByTemplateIdOrderByHeaderOrderAsc, findByTemplateIdAndId, existsByTemplateIdAndCode, deleteByTemplateId |
+| `src/main/java/.../repository/ChecklistHeaderValueRepository.java` | Repositorio para ChecklistHeaderValue |
+| `src/main/java/.../service/ChecklistTemplateHeaderService.java` | Servicio CRUD con DuplicateCodeException / ResourceNotFoundException |
+| `src/main/java/.../controller/ChecklistTemplateHeaderController.java` | MVC controller bajo /templates/{templateId}/headers (list, create, edit, update, delete) |
+| `src/main/resources/templates/header/list.html` | Vista listado de cabeceras con tabla + empty state |
+| `src/main/resources/templates/header/form.html` | Vista formulario con toggle SELECT para tipo, textarea de opciones |
+
+## Modificaciones en Fase 8-B
+
+| Archivo | Cambio |
+|---------|--------|
+| `src/main/java/.../domain/template/ChecklistTemplate.java` | Añadido `@OneToMany` headers + helpers addHeader/removeHeader |
+| `src/main/java/.../domain/Checklist.java` | Añadidos templateId (nullable) y templateName |
+| `src/main/java/.../domain/ChecklistItem.java` | Añadidos phaseOrder, phaseName, code, itemType, required |
+| `src/main/java/.../dto/ChecklistTemplateDTO.java` | Añadido currentVersionId |
+| `src/main/java/.../dto/ChecklistDTO.java` | Añadidos templateId, templateName, headerValues, nuevos campos de item |
+| `src/main/java/.../dto/ChecklistCreateDTO.java` | Añadido templateId |
+| `src/main/java/.../dto/ChecklistItemDTO.java` | Añadidos code, itemType, required, phaseOrder, phaseName |
+| `src/main/java/.../service/ChecklistTemplateService.java` | toDTO() ahora setea currentVersionId |
+| `src/main/java/.../service/ChecklistService.java` | Nuevos 3 deps (template, version, header repos); create() copia items/headers desde template activa y permite items manuales (phaseOrder=0); se cambió `else if` por `if` para permitir items manuales + template |
+| `src/main/java/.../controller/ChecklistController.java` | Añadido ChecklistTemplateService dep; nuevo endpoint /from-template/{templateId}; detail() agrupa items por fase en PhaseGroupDTO |
+| `src/main/resources/ValidationMessages.properties` | Añadidos mensajes para cabeceras |
+| `src/main/resources/templates/checklist/form.html` | Añadido selector de plantilla; items manuales siempre visibles; info alert cuando hay plantilla; **eliminados matrícula y tipo de transporte** |
+| `src/main/resources/templates/checklist/detail.html` | **Eliminados matrícula y tipo de transporte** del detalle; items agrupados por fase |
+| `src/main/resources/templates/checklist/list.html` | **Eliminadas columnas matrícula y tipo de transporte** del listado |
+| `src/main/java/.../domain/Checklist.java` | **Eliminados campos transportPlate y transportType** (se definen como cabeceras de plantilla si se necesitan) |
+| `src/main/java/.../dto/ChecklistDTO.java` | **Eliminados transportPlate y transportType** |
+| `src/main/java/.../dto/ChecklistCreateDTO.java` | **Eliminados transportPlate y transportType** y sus validaciones |
+| `src/main/java/.../service/ChecklistService.java` | **Eliminado searchByPlate** y referencias a transportPlate/transportType en create() y toDTO() |
+| `src/main/java/.../repository/ChecklistRepository.java` | **Eliminados findByTransportPlateContainingIgnoreCase** |
+| `src/main/java/.../controller/ChecklistController.java` | detail() agrupa items por fase en PhaseGroupDTO |
+| `src/main/resources/templates/checklist/detail.html` | Muestra template name/link, header values, items agrupados por fase con PhaseGroupDTO |
+| `src/main/resources/templates/template/detail.html` | Botones "Gestionar Cabeceras", "Gestionar Fases" directo, "Crear Lista desde Plantilla" |
+| `src/main/resources/templates/template/list.html` | Botón "Crear Lista" por fila |
+| `src/main/resources/templates/fragments/navbar.html` | Añadido enlace "Plantillas" |
+
 ## Notas Técnicas
 
 ### JPA y Hibernate
@@ -311,7 +419,7 @@ ChecklistTemplate (1) ─── * ChecklistTemplateVersion (1) ─── * Check
 ```
 
 ### Tests
-- **Totales**: 109 (85 anteriores + 14 service + 10 controller), BUILD SUCCESS.
+- **Totales**: 133, BUILD SUCCESS.
 - Fase 4: 14 tests de integración cubren CRUD por código, activos, versiones, fases, ítems, cascade delete, variantes de ItemType, transición de ChecklistExecutionStatus.
 - Fase 5: 11 tests unitarios de servicio (Mockito) + 9 tests MVC (MockMvc) cubren CRUD completo, validación, búsqueda, soft delete.
 - Fase 6: 5 nuevos tests unitarios de servicio (findVersionsByTemplateId, findVersionById, version mismatch, error cases) + 2 nuevos tests MVC (version history, version detail). 16 tests de servicio total + 11 tests MVC total.

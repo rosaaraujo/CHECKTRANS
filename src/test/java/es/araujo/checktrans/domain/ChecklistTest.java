@@ -12,8 +12,6 @@ class ChecklistTest {
     void shouldCreateChecklistWithDefaultStatus() {
         Checklist checklist = new Checklist();
         checklist.setCode("CT-001");
-        checklist.setTransportPlate("1234ABC");
-        checklist.setTransportType("TRUCK");
         checklist.setInspectorName("Inspector 1");
         checklist.setCheckDate(LocalDateTime.now());
 
@@ -28,8 +26,6 @@ class ChecklistTest {
     void shouldAddItemToChecklist() {
         Checklist checklist = new Checklist();
         checklist.setCode("CT-001");
-        checklist.setTransportPlate("1234ABC");
-        checklist.setTransportType("TRUCK");
         checklist.setInspectorName("Inspector 1");
         checklist.setCheckDate(LocalDateTime.now());
 
@@ -47,8 +43,6 @@ class ChecklistTest {
     void shouldRemoveItemFromChecklist() {
         Checklist checklist = new Checklist();
         checklist.setCode("CT-001");
-        checklist.setTransportPlate("1234ABC");
-        checklist.setTransportType("TRUCK");
         checklist.setInspectorName("Inspector 1");
         checklist.setCheckDate(LocalDateTime.now());
 

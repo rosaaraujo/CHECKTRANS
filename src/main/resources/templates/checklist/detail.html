@@ -52,14 +52,6 @@
                                 </p>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="text-muted small">Matr&iacute;cula</label>
-                                <p class="fw-bold mb-0" th:text="${checklist.transportPlate}">1234ABC</p>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="text-muted small">Tipo de Transporte</label>
-                                <p class="fw-bold mb-0" th:text="${checklist.transportType}">TRUCK</p>
-                            </div>
-                            <div class="col-md-6 mb-3">
                                 <label class="text-muted small">Inspector</label>
                                 <p class="fw-bold mb-0" th:text="${checklist.inspectorName}">Inspector</p>
                             </div>
@@ -68,6 +60,13 @@
                                 <p class="fw-bold mb-0"
                                    th:text="${#temporals.format(checklist.checkDate, 'dd/MM/yyyy HH:mm')}">01/01/2026</p>
                             </div>
+                        </div>
+
+                        <div th:if="${checklist.templateName}" class="mt-2">
+                            <label class="text-muted small">Plantilla base</label>
+                            <p class="fw-bold mb-0">
+                                <a th:href="@{/templates/{id}(id=${checklist.templateId})}" th:text="${checklist.templateName}">Plantilla</a>
+                            </p>
                         </div>
 
                         <div th:if="${checklist.observations}" class="mt-2">
@@ -87,9 +86,30 @@
                     </div>
                 </div>
 
-                <div class="card card-checktrans">
+                <div th:if="${not #lists.isEmpty(checklist.headerValues)}" class="card card-checktrans mb-4">
                     <div class="card-header">
-                        <h5><i class="fas fa-tasks me-2"></i>Elementos de la Lista</h5>
+                        <h5><i class="fas fa-heading me-2"></i>Datos de Cabecera</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3" th:each="hv : ${checklist.headerValues}">
+                                <label class="text-muted small" th:text="${hv.headerLabel}">Campo</label>
+                                <p class="fw-bold mb-0" th:text="${hv.value != null ? hv.value : 'Pendiente'}">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:each="group : ${phaseGroups}" class="card card-checktrans mb-4">
+                    <div class="card-header">
+                        <h5>
+                            <i class="fas fa-tasks me-2"></i>
+                            <th:block th:if="${group.phaseOrder == 0}">Elementos Adicionales</th:block>
+                            <th:block th:unless="${group.phaseOrder == 0}">
+                                Fase <span th:text="${group.phaseOrder}"></span>:
+                                <span th:text="${group.phaseName}"></span>
+                            </th:block>
+                        </h5>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-checktrans">
@@ -102,8 +122,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="item : ${checklist.items}"
-                                    th:unless="${#lists.isEmpty(checklist.items)}">
+                                <tr th:each="item : ${group.items}">
                                     <td data-label="#" th:text="${item.itemOrder}">1</td>
                                     <td data-label="Descripci&oacute;n" th:text="${item.description}">Descripci&oacute;n</td>
                                     <td data-label="Resultado">
@@ -121,8 +140,24 @@
                                     </td>
                                     <td data-label="Observaciones" th:text="${item.observations}">-</td>
                                 </tr>
-                                <tr th:if="${#lists.isEmpty(checklist.items)}">
+                                <tr th:if="${#lists.isEmpty(group.items)}">
                                     <td colspan="4" class="text-center py-4 text-muted">
+                                        <i class="fas fa-inbox me-2"></i>Sin elementos registrados
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div th:if="${#lists.isEmpty(checklist.items)}" class="card card-checktrans">
+                    <div class="card-header">
+                        <h5><i class="fas fa-tasks me-2"></i>Elementos de la Lista</h5>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-checktrans">
+                            <tbody>
+                                <tr>
+                                    <td class="text-center py-4 text-muted">
                                         <i class="fas fa-inbox me-2"></i>Sin elementos registrados
                                     </td>
                                 </tr>

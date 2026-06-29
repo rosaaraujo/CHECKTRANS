@@ -10,6 +10,7 @@ public class ChecklistTemplateDTO {
     private String name;
     private String description;
     private Boolean active;
+    private Long currentVersionId;
     private Integer currentVersionNumber;
     private LocalDate currentVersionDate;
     private LocalDateTime createdAt;
@@ -64,6 +65,14 @@ public class ChecklistTemplateDTO {
 
     public void setCurrentVersionNumber(Integer currentVersionNumber) {
         this.currentVersionNumber = currentVersionNumber;
+    }
+
+    public Long getCurrentVersionId() {
+        return currentVersionId;
+    }
+
+    public void setCurrentVersionId(Long currentVersionId) {
+        this.currentVersionId = currentVersionId;
     }
 
     public LocalDate getCurrentVersionDate() {

@@ -15,8 +15,6 @@ class ChecklistDTOTest {
         ChecklistDTO dto = new ChecklistDTO();
         dto.setId(1L);
         dto.setCode("CT-001");
-        dto.setTransportPlate("1234ABC");
-        dto.setTransportType("TRUCK");
         dto.setInspectorName("Inspector");
         dto.setCheckDate(now);
         dto.setStatus(ChecklistStatus.DRAFT);
@@ -31,8 +29,6 @@ class ChecklistDTOTest {
 
         assertEquals(1L, dto.getId());
         assertEquals("CT-001", dto.getCode());
-        assertEquals("1234ABC", dto.getTransportPlate());
-        assertEquals("TRUCK", dto.getTransportType());
         assertEquals("Inspector", dto.getInspectorName());
         assertEquals(now, dto.getCheckDate());
         assertEquals(ChecklistStatus.DRAFT, dto.getStatus());

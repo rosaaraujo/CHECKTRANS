@@ -134,41 +134,57 @@
 
 ---
 
-### Fase 7 — Ejecución de Listas de Chequeo
+### Fase 7 — Gestión de Fases (Completada)
 
-**Objetivo:** Implementar el flujo completo de ejecución de una lista de chequeo sobre un transporte.
+**Objetivo:** Implementar gestión CRUD de fases dentro de versiones de plantilla, con reordenación.
 
 **Funcionalidades:**
-- Crear una ejecución a partir de una plantilla o lista en blanco
-- Registrar respuestas por ítem (APTO / NO APTO / N/A)
-- Observaciones por ítem
-- Firmar digitalmente la ejecución (nombre + fecha)
-- Cambio de estado: `IN_PROGRESS` → `COMPLETED` → `APPROVED` / `REJECTED`
-- Histórico de ejecuciones por transporte
+- CRUD completo de fases con código único dentro de cada versión
+- Reordenación (moveUp/moveDown) intercambiando phaseOrder
+- Vistas anidadas bajo `/templates/{templateId}/versions/{versionId}/phases`
+- Validación de unicidad de código a nivel BD
+
+**Cobertura de tests:** 109 tests (14 service + 10 controller nuevos), BUILD SUCCESS
+
+---
+
+### Fase 8 — Ejecución de Checklists + Dashboard y Reportes
+
+**Objetivo:** Implementar el flujo completo de ejecución de listas de chequeo, generación de documentos PDF/Excel y dashboard de KPIs.
+
+**Funcionalidades:**
+
+*Ejecución de Checklists (Workflow)*
+- Inicio de ejecución: selección de plantilla, nombre de ejecución y relleno de campos de cabecera
+- Evaluación fase por fase: cada ítem se califica como SI / NO / NA, con comentarios opcionales
+- Resumen previo a la finalización con conteo por fase
+- Firma digital mediante pad HTML5 Canvas (ratón y táctil)
+- Finalización con guardado de firma como Base64 en BD
+- Visualización de ejecuciones completadas en modo solo lectura
+
+*Generación de Documentos*
+- **PDF**: documento profesional con logo corporativo, tabla de cabeceras, ítems codificados por color (SI=verde, NO=rojo, NA=gris), firma y sello, números de página, pie con versión y fecha
+- **Excel (XLSX)**: mismo contenido estructurado con estilos, celdas coloreadas, anchos de columna y bordes
+
+*Histórico de Ejecuciones*
+- Listado completo con filtro por texto en cliente
+- Acceso a vista detallada, PDF y Excel desde el listado
+
+*Dashboard*
+- KPIs: total ejecuciones, por estado, por inspector, por tipo de transporte
+- Filtros avanzados (fechas, estado, inspector)
+
+**Tecnologías adicionales:**
+- Apache POI para generación de Excel
+- iText o Flying Saucer para PDF
+- Thymeleaf + Bootstrap 5 para dashboard (sin Chart.js ni frameworks JS adicionales)
 
 **Modelo de dominio a implementar:**
 - `Execution` — Ejecución de una lista de chequeo
 - `ExecutionItem` — Respuesta de un ítem en una ejecución
-- `Signature` — Firma de la ejecución
+- `Signature` — Firma digital (Base64)
 
-**Cobertura de tests esperada:** ~80 tests
-
----
-
-### Fase 8 — Dashboard y Reportes
-
-**Objetivo:** Proporcionar dashboards visuales y reportes exportables.
-
-**Funcionalidades:**
-- Dashboard con KPIs: total listas, aprobadas, rechazadas, pendientes
-- Gráficos por inspector, tipo de transporte, período
-- Reporte PDF de una ejecución
-- Exportación CSV de listados
-- Filtros avanzados (fechas, inspector, estado, tipo transporte)
-
-**Tecnología:** Chart.js (única excepción JS) o tablas HTML con Bootstrap
-
-**Cobertura de tests esperada:** ~100 tests
+**Cobertura de tests esperada:** ~150 tests
 
 ---
 
@@ -224,15 +240,16 @@
 | 1.2.0   | Fase 3     | Sistema visual corporativo            | 45    |
 | 2.0.0   | Fase 4     | Modelo JPA de plantillas              | 58    |
 | 2.1.0   | Fase 5     | Gestión de plantillas (CRUD)          | ~75   |
-| 2.2.0   | Fase 6     | Autenticación y autorización          | ~95   |
-| 2.3.0   | Fase 7     | Ejecución de listas de chequeo        | ~115  |
-| 3.0.0   | Fase 8     | Dashboard y reportes                  | ~135  |
+| 2.2.0   | Fase 6     | Versionado de plantillas              | 95    |
+| 2.3.0   | Fase 7     | Gestión de fases                      | 109   |
+| 3.0.0   | Fase 8     | Ejecución + Dashboard + Documentos    | ~150  |
 | 3.1.0   | Fase 9     | API REST                              | ~155  |
 | 3.2.0   | Fase 10    | Notificaciones                        | ~165  |
 | 4.0.0   | Fase 11    | Despliegue Railway                    | ~165  |
 
 ## Estado Actual
 
-**Fase activa:** Fase 4 — Modelo JPA de plantillas (completada)
-**Próxima fase:** Fase 5 — Gestión de plantillas (CRUD servicios/vistas)
+**Fase activa:** Fase 7 — Gestión de fases (completada)
+**Próxima fase:** Fase 8 — Ejecución de Checklists + Dashboard y Reportes
 **Versión:** 2.0.0-SNAPSHOT
+**Tests:** 109 tests, BUILD SUCCESS

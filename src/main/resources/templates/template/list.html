@@ -97,6 +97,10 @@
                                     </span>
                                 </td>
                                 <td data-label="Acciones" class="text-end">
+                                    <a th:href="@{/checklists/from-template/{id}(id=${template.id})}"
+                                       class="btn btn-sm btn-outline-accent" th:title="|Crear Lista|">
+                                        <i class="fas fa-play"></i>
+                                    </a>
                                     <a th:href="@{/templates/{id}(id=${template.id})}"
                                        class="btn btn-sm btn-outline-primary">
                                         <i class="fas fa-eye"></i>

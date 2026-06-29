@@ -20,6 +20,12 @@ public class ChecklistItemDTO {
     @NotNull(message = "{checklist.item.order.required}")
     private Integer itemOrder;
 
+    private String code;
+    private String itemType;
+    private Boolean required;
+    private Integer phaseOrder;
+    private String phaseName;
+
     public ChecklistItemDTO() {
     }
 
@@ -61,5 +67,45 @@ public class ChecklistItemDTO {
 
     public void setItemOrder(Integer itemOrder) {
         this.itemOrder = itemOrder;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getItemType() {
+        return itemType;
+    }
+
+    public void setItemType(String itemType) {
+        this.itemType = itemType;
+    }
+
+    public Boolean getRequired() {
+        return required;
+    }
+
+    public void setRequired(Boolean required) {
+        this.required = required;
+    }
+
+    public Integer getPhaseOrder() {
+        return phaseOrder;
+    }
+
+    public void setPhaseOrder(Integer phaseOrder) {
+        this.phaseOrder = phaseOrder;
+    }
+
+    public String getPhaseName() {
+        return phaseName;
+    }
+
+    public void setPhaseName(String phaseName) {
+        this.phaseName = phaseName;
     }
 }

@@ -98,7 +98,7 @@ es.araujo.checktrans
 - **MINOR**: Nueva funcionalidad sin rotura (ej: nueva fase completa)
 - **PATCH**: Correcciones, refactors, documentación
 
-**Versión actual:** `1.0.0-SNAPSHOT` (Fase 1 completada)
+**Versión actual:** `2.0.0-SNAPSHOT` (Fase 7 completada — Gestión de fases)
 
 ## Estrategia de Despliegue
 

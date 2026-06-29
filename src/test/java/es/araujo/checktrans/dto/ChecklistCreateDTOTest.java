@@ -13,15 +13,11 @@ class ChecklistCreateDTOTest {
         LocalDateTime now = LocalDateTime.now();
         ChecklistCreateDTO dto = new ChecklistCreateDTO();
         dto.setCode("CT-001");
-        dto.setTransportPlate("1234ABC");
-        dto.setTransportType("TRUCK");
         dto.setInspectorName("Inspector");
         dto.setCheckDate(now);
         dto.setObservations("Some notes");
 
         assertEquals("CT-001", dto.getCode());
-        assertEquals("1234ABC", dto.getTransportPlate());
-        assertEquals("TRUCK", dto.getTransportType());
         assertEquals("Inspector", dto.getInspectorName());
         assertEquals(now, dto.getCheckDate());
         assertEquals("Some notes", dto.getObservations());
